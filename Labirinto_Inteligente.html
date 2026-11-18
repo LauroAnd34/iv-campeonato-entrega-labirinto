@@ -458,6 +458,72 @@ body.tv .stt.run{color:var(--tv-ok)}body.tv .stt.warn{color:#f5c451}body.tv .stt
 .ffm .stt{font-size:1em}
 input[type=password]{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:7px 9px;font:inherit;color:inherit}
 
+/* ===== Inspeção: listas didáticas (na chamada / aguardando / resolvidas) ===== */
+.bigb{font-size:16px;padding:11px 18px}
+.ilist{display:flex;flex-direction:column;gap:8px}
+.irow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 14px;align-items:center;border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;background:var(--panel)}
+.irow.now{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent);background:var(--accent-soft)}
+.irow.done{opacity:.8}
+.irow .io{font-family:var(--f-mono);font-weight:700;font-size:22px;color:var(--accent);min-width:2ch;text-align:center}
+.irow .in b{font-size:17px;display:block}
+.irow .ist{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.irow .ia{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.irow .acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.pesof{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:0 10px 0 4px}
+.pesof input{width:6.5em;border:0;background:transparent;font-family:var(--f-mono);font-size:18px;padding:8px 4px;text-align:right;color:var(--ink)}
+.pesof input:focus{outline:none}.pesof:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.pesof span{color:var(--muted);font-weight:600}
+details.panel>summary{cursor:pointer;list-style:none}details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary::before{content:"▸ ";color:var(--muted)}details.panel[open]>summary::before{content:"▾ "}
+/* diálogo: chamar várias equipes */
+.cmopts{display:flex;flex-wrap:wrap;gap:6px}
+.cmlist{max-height:min(52vh,460px);overflow:auto;border:1px solid var(--line);border-radius:var(--r);padding:4px}
+.cmi{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:2px 10px;align-items:center;padding:8px 10px;border-radius:8px;cursor:pointer}
+.cmi:hover{background:var(--accent-soft)}
+.cmi input{width:20px;height:20px}
+.cmi .io{font-family:var(--f-mono);font-weight:700;color:var(--accent)}
+.cmi .campus{grid-column:3}
+.ffmore{color:var(--tv-muted);font-size:1.05em;border-top:1px solid var(--tv-line);padding-top:.4em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ===== Treino ===== */
+.trclk{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600;font-size:clamp(56px,13vw,120px);line-height:1.05;margin-top:10px}
+.trclk.last{color:var(--warn)}.trclk.final,.trclk.over{color:var(--bad)}
+.trform{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-top:12px}
+.trform input,.trform select{font-size:16px}
+.trform #tr-lab{min-width:14em}
+.trform .num2{width:4.5em;font-family:var(--f-mono);text-align:center}
+.cxtreino{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4vh;text-align:center}
+.cxtl{font-family:var(--f-display);font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:3.2em;color:var(--tv-acc)}
+.cxeq{font-size:1.8em;color:var(--tv-muted)}.cxeq b{color:var(--tv-ink)}
+.cxring{position:relative;width:min(62vh,70vw);aspect-ratio:1}
+.cxring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.cxring circle{fill:none;stroke-width:5}
+.cxring .bg{stroke:var(--tv-line)}
+.cxring .fg{stroke:var(--tv-ok);stroke-linecap:round;stroke-dasharray:283;transition:stroke-dashoffset .2s linear,stroke .4s}
+.cxring .fg.last{stroke:#f5c451}.cxring .fg.final{stroke:#ff6b6b}
+.cxbig{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600;font-size:min(15vw,21vh);letter-spacing:-.03em}
+.cxbig.hh{font-size:min(10vw,14vh)}
+.cxbig.last{color:#f5c451}.cxbig.final{color:#ff6b6b;animation:trpulse .5s ease-in-out infinite alternate}
+.cxbig.over{color:#ff6b6b;animation:trblink 1s step-end infinite}
+@keyframes trpulse{from{transform:scale(1)}to{transform:scale(1.06)}}
+@keyframes trblink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.cxbig.final,.cxbig.over{animation:none}}
+/* ===== Celular ===== */
+@media (max-width:700px){
+  body:not(.tv) .wrap{padding-left:12px;padding-right:12px}
+  body:not(.tv) .btn{min-height:42px}
+  .bigb{width:100%;justify-content:center}
+  .irow{grid-template-columns:auto minmax(0,1fr);padding:10px}
+  .irow .ia{grid-column:1/-1;justify-content:flex-start}
+  .irow .acts{justify-content:flex-start}
+  .irow .acts .btn{flex:1 1 44%}
+  .pesof input{width:100%}.pesof{flex:1 1 100%}
+  .trform>*{flex:1 1 100%}.trform .f:has(.num2){flex:1 1 40%}.trform .num2{width:100%}
+  body:not(.tv) main table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .steps{overflow-x:auto;flex-wrap:nowrap!important;scrollbar-width:none}.steps .step{flex:0 0 auto}
+  .clkbar{overflow-x:auto;flex-wrap:nowrap!important}.clkitem{flex:0 0 auto}
+  .cmopts .mod-tab{flex:1 1 100%;justify-content:space-between}
+}
+
 </style>
 
 <div id="app"></div>
@@ -20704,12 +20770,17 @@ const api=(p,o)=>fetch(p,Object.assign({cache:'no-store'},o||{}));
 async function srvBoot(){let j=null;try{const r=await api('api/state');if(!r.ok)return false;j=await r.json();if(!j||j.modalidade!==K0)return false}catch(e){return false}
   mode='srv';SKEW=j.now-Date.now();srvNeedPin=!!j.pin;
   if(j.tv)TV=Object.assign(TV,j.tv);
-  if(j.st){S[K0]=normalize(K0,j.st);store('st:'+K0,S[K0]);srvSynced=JSON.stringify(S[K0])}
+  /* servidor reiniciado com dados mais antigos que os deste aparelho: o mais novo vale */
+  const loc=S[K0];const locNewer=!isTV()&&!!j.st&&!!loc&&(loc.equipes||[]).length>0&&(loc.atualizado||0)>(j.st.atualizado||0)&&(!srvNeedPin||!!srvPin);
+  if(j.st&&!locNewer){S[K0]=normalize(K0,j.st);store('st:'+K0,S[K0]);srvSynced=JSON.stringify(S[K0])}
   seen[K0]=(S[K0].cham||{}).seq||0;seenSort[K0]=(S[K0].mostrar||{}).at||0;
   syncMsg='Sincronizado com o servidor';setDot('ok');render();
   srvPinOk=!srvNeedPin||await srvCheck(srvPin);if(!srvPinOk&&!isTV()){syncMsg='Só leitura: digite o PIN para salvar';setDot('bad');renderSync();askPin()}
+  if(locNewer){if(srvPinOk){srvPushFull();toast('Este aparelho tinha lançamentos mais novos: enviados ao servidor')}else{S[K0]=normalize(K0,j.st);store('st:'+K0,S[K0]);srvSynced=JSON.stringify(S[K0]);render()}}
   if(!j.st&&(!srvNeedPin||srvPin))srvPushFull();
   srvStream();return true}
+/* mantém o servidor gratuito acordado enquanto houver um aparelho com o site aberto */
+setInterval(()=>{if(mode==='srv')api('healthz').catch(()=>{})},240000);
 let srvLast=0;function srvStream(){try{es&&es.close()}catch(e){}srvLast=Date.now();es=new EventSource('api/stream');
   es.addEventListener('ping',ev=>{srvLast=Date.now();const t=+ev.data;if(t)SKEW=t-Date.now()});
   es.onmessage=ev=>{srvLast=Date.now();let d;try{d=JSON.parse(ev.data)}catch(x){return}SKEW=d.now-Date.now();
@@ -20771,11 +20842,11 @@ let rq=0;function render(){if(rq)return;rq=setTimeout(()=>{rq=0;const a=document
 
 /* ===== Coordenação ===== */
 /* Partes do telão, trocadas daqui de qualquer etapa (ou pelas teclas 1 a 5 no próprio telão) */
-const TVV=[['auto','Automático'],['ordem','Ordem de passagem'],['chamada','Chamada'],['arenas','Arenas e relógios'],['classif','Pontuação']];
-const STEPS=[['equipes','Presença e ordem'],['chamada','Chamada'],['f','Arena fácil'],['d','Arena difícil'],['classif','Classificação'],['telao','Telão e arquivos']];
-function clockBar(st,tm){if(!ARS.some(ar=>(st.rel[ar]||{}).id))return'';
+const TVV=[['auto','Automático'],['ordem','Ordem de passagem'],['chamada','Chamada'],['arenas','Arenas e relógios'],['classif','Pontuação'],['treino','Treino']];
+const STEPS=[['equipes','Presença e ordem'],['chamada','Chamada'],['f','Arena fácil'],['d','Arena difícil'],['treino','Treino'],['classif','Classificação'],['telao','Telão e arquivos']];
+function clockBar(st,tm){const T=st.treino;const trB=T?`<button class="clkitem ${ui.step==='treino'?'cur':''}" data-act="step" data-k="treino"><span class="al">${esc(T.label)}</span><span class="c" data-tr>${fmtH(remT(T))}</span><span class="stt" data-trst></span></button>`:'';if(!ARS.some(ar=>(st.rel[ar]||{}).id))return T?`<div class="clkbar" aria-label="Relógios">${trB}</div>`:'';
   return`<div class="clkbar" aria-label="Relógios das arenas">${ARS.map(ar=>{const id=(st.rel[ar]||{}).id;
-    return`<button class="clkitem ${ui.step===ar?'cur':''}" data-act="step" data-k="${ar}" title="Abrir a ${AR[ar].toLowerCase()}"><span class="al">${AR[ar]}</span>${id?`<span class="tn">${pad2(ordNum(st,id))} · ${esc(tname(tm,id))}</span><span class="c" data-clk="${st.key}:${ar}">0:00,0</span><span class="stt" data-st="${st.key}:${ar}"></span>`:'<span class="stt">Arena livre</span>'}</button>`}).join('')}</div>`}
+    return`<button class="clkitem ${ui.step===ar?'cur':''}" data-act="step" data-k="${ar}" title="Abrir a ${AR[ar].toLowerCase()}"><span class="al">${AR[ar]}</span>${id?`<span class="tn">${pad2(ordNum(st,id))} · ${esc(tname(tm,id))}</span><span class="c" data-clk="${st.key}:${ar}">0:00,0</span><span class="stt" data-st="${st.key}:${ar}"></span>`:'<span class="stt">Arena livre</span>'}</button>`}).join('')}${trB}</div>`}
 function renderApp(){document.body.classList.remove('tv');const st=S[ui.mod],tm=tmOf(st);if(!STEPS.some(x=>x[0]===ui.step))ui.step='equipes';
   $('#app').innerHTML=`<header class="top"><div class="wrap">
     <div class="top-row"><div class="brand"><div class="logos"><span class="plate"><img class="lg-ifma" src="${LG['lg-ifma']||''}" alt="Instituto Federal do Maranhão"></span><span class="plate"><img class="lg-pirpta" src="${LG['lg-pirpta']||''}" alt="Programa Institucional de Robótica, Programação e Tecnologias Aplicadas"></span></div><div class="txt"><h1>Coordenação de prova</h1><small>IV Campeonato de Robótica · Universo IF 2026</small></div></div>
@@ -20783,7 +20854,7 @@ function renderApp(){document.body.classList.remove('tv');const st=S[ui.mod],tm=
       <button class="btn" data-act="rules" title="Regras desta prova">📖 Regras</button><button class="btn small" data-act="undo" ${undo[ui.mod].length?'':'disabled'} title="Desfazer a última ação nesta modalidade">Desfazer</button>
       <span class="sync" id="sync"></span></div>
     <nav class="steps">${STEPS.map(([k,l],i)=>`<button class="step" data-act="step" data-k="${k}" aria-current="${ui.step===k}"><b>${i+1}</b>${l}</button>`).join('')}</nav>${clockBar(st,tm)}</div></header>
-  <main class="wrap">${({equipes:vEquipes,chamada:vChamada,f:(a,b)=>vArena(a,b,'f'),d:(a,b)=>vArena(a,b,'d'),classif:vClassif,telao:vTelao})[ui.step](st,tm)}</main>`;renderSync()}
+  <main class="wrap">${({equipes:vEquipes,chamada:vChamada,f:(a,b)=>vArena(a,b,'f'),d:(a,b)=>vArena(a,b,'d'),treino:vTreino,classif:vClassif,telao:vTelao})[ui.step](st,tm)}</main>`;renderSync()}
 
 function sortAta(st,tm,r){const nm=ids=>ids.map(id=>tname(tm,id)).join(', ');const quando=new Date(r.at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
   return`Sorteio de ${quando}, código <b class="mono">${r.codigo}</b>: ${r.sorteadas.length} equipes presentes sorteadas${r.fora.length?`; ${r.fora.length} ausente(s) ou desclassificada(s) ficaram no fim, fora do sorteio (${esc(nm(r.fora))})`:''}. Regra: equipes do mesmo campus não ficam em sequência, porque equipes vizinhas passam ao mesmo tempo nas duas arenas${r.conflitos?` · <b>${r.conflitos} repetição(ões) de campus inevitável(is)</b> (há equipes demais do mesmo campus para separar todas)`:' · nenhuma repetição de campus em sequência'}. Qualquer pessoa confere: sorteando de novo com o mesmo código e as mesmas ausências, a ordem sai igual.`}
@@ -20810,29 +20881,50 @@ function vEquipes(st,tm){const mi=modInfo(st.key);const na=st.equipes.filter(t=>
 /* ----- Chamada ----- */
 function callsHTML(n,max){let h='';for(let i=0;i<max;i++)h+=`<i class="${i<n?'on':''}"></i>`;return`<span class="calls" title="${n} de ${max} chamadas">${h}</span>`}
 function inspChip(r){const s=r&&r.st;return s==='ok'?'<span class="chip ok">aprovada · quarentena</span>':s==='rep'?`<span class="chip warn">reprovada · ajuste <span class="cd" data-cd="${(r.rep||0)+180000}"></span></span>`:s==='falta'?'<span class="chip bad">não apresentou</span>':r&&r.c&&r.c.length?'<span class="chip acc">chamada</span>':'<span class="chip">aguardando</span>'}
-function annText(st,tm,a,id,n){if(a==='all'){const L=st.equipes.filter(t=>!t.aus&&!t.desc).map(t=>t.nome);return`Atenção, equipes do ${modInfo(st.key).nome}! ${st.fase==='provas'?'Todas as equipes, dirijam-se às arenas.':'Todas as equipes, apresentem os robôs na inspeção técnica.'} Equipes: ${L.join(', ')}.`}const dest=a==='i'?'apresentar o robô na inspeção técnica':a==='f'?'dirigir-se à arena fácil':'dirigir-se à arena difícil';
+function annText(st,tm,a,id,n){if(a==='all'){const L=((st.cham&&st.cham.ids)||st.equipes.filter(t=>!t.aus&&!t.desc).map(t=>t.id)).map(x=>tname(tm,x));return`Atenção, equipes do ${modInfo(st.key).nome}! ${st.fase==='provas'?'Todas as equipes, dirijam-se às arenas.':'Todas as equipes, apresentem os robôs na inspeção técnica.'} Equipes: ${L.join(', ')}.`}const dest=a==='i'?'apresentar o robô na inspeção técnica':a==='f'?'dirigir-se à arena fácil':'dirigir-se à arena difícil';
   return`Equipe ${tname(tm,id)}, do campus ${tcamp(tm,id)}, ${dest}. ${n}ª chamada.`}
 function vChamada(st,tm){const mi=modInfo(st.key);
   const fase=`<div class="mods" role="group" aria-label="Fase"><button class="mod-tab" data-act="fase" data-k="inspecao" aria-pressed="${st.fase==='inspecao'}">Inspeção técnica</button><button class="mod-tab" data-act="fase" data-k="provas" aria-pressed="${st.fase==='provas'}">Provas nas arenas</button></div>`;
   const last=st.cham?`<p class="hint" style="margin-top:8px">Última chamada (${new Date(st.cham.at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}): ${esc(annText(st,tm,st.cham.a,st.cham.id,st.cham.n))}</p>`:'';
   return`<div class="section"><div class="panel"><div class="row"><div class="grow"><h2>Chamada das equipes · ${esc(mi.nome)}</h2><p class="hint">Cada chamada aparece em destaque no telão, com aviso sonoro. Escolha a fase que está acontecendo agora; o telão acompanha.</p></div>${fase}</div>
-   <div class="row" style="margin-top:10px"><button class="btn primary" data-act="callAll">📣 Chamar todas as equipes</button><span class="hint" style="margin:0">Mostra o nome da modalidade e todas as equipes no telão, com aviso sonoro.</span></div>${last}</div>
-   ${st.fase==='provas'?vChamProvas(st,tm):vChamInsp(st,tm)}</div>`}
-function vChamInsp(st,tm){const max=st.cfg.chamadas||3;const ids=ordered(st,st.adiI);
-  const cnt={ok:0,rep:0,falta:0,cham:0,ag:0};ids.forEach(id=>{const t=tm[id];if(t.aus||t.desc)return;const r=st.insp[id]||{};if(r.st==='ok')cnt.ok++;else if(r.st==='rep')cnt.rep++;else if(r.st==='falta')cnt.falta++;else if(r.c&&r.c.length)cnt.cham++;else cnt.ag++});
-  const prox=filaInsp(st).find(id=>!((st.insp[id]||{}).c||[]).length);
-  return`<div class="panel"><div class="row"><div class="grow"><h2>Inspeção técnica</h2><p class="hint">5.2: três chamadas, com cerca de 2 minutos entre elas. Robô reprovado pode ser ajustado em até 3 minutos e apresentado de novo. Quem não apresentar o robô até a última chamada perde as provas. Equipe disputando outra modalidade vai para o fim da fila, sem penalidade (5.4). Peso até 1.575 g; dimensões ${st.key==='labirinto'?'15 × 15 cm, altura livre':'25 × 25 × 25 cm'}.</p></div>
-    ${prox?`<button class="btn primary" data-act="call" data-a="i" data-id="${prox}">Chamar a próxima: ${pad2(ordNum(st,prox))} · ${esc(tname(tm,prox))}</button>`:''}</div>
-   <div class="row" style="margin-top:10px"><span class="chip ok">aprovadas <b class="num">${cnt.ok}</b></span><span class="chip acc">chamadas <b class="num">${cnt.cham}</b></span><span class="chip">aguardando <b class="num">${cnt.ag}</b></span><span class="chip warn">reprovadas <b class="num">${cnt.rep}</b></span><span class="chip bad">não apresentaram <b class="num">${cnt.falta}</b></span></div></div>
-  <div class="panel"><div class="tablewrap"><table><thead><tr><th class="n">Ordem</th><th>Equipe</th><th>Chamadas</th><th>Situação</th><th>Peso (g)</th><th></th></tr></thead><tbody>
-  ${ids.map(id=>{const t=tm[id];if(t.aus||t.desc)return`<tr class="out"><td class="n">${pad2(ordNum(st,id))}</td><td><b>${esc(t.nome)}</b><br><span class="campus">${esc(t.campus)}</span></td><td colspan="4"><span class="chip warn">${t.aus?'ausente':'desclassificada'}</span></td></tr>`;
-    const r=st.insp[id]||{};const c=(r.c||[]).length;const lastC=c?r.c[c-1]:0;const peso=r.peso;const pesoBad=peso!=null&&peso!==''&&+peso>1575;const open=r.st!=='ok'&&r.st!=='falta';
-    return`<tr class="${r.st==='falta'?'out':''} ${open&&st.cham&&st.cham.a==='i'&&st.cham.id===id?'now':''}"><td class="n">${pad2(ordNum(st,id))}</td><td><b>${esc(t.nome)}</b><br><span class="campus">${esc(t.campus)}</span>${st.adiI.includes(id)&&open?' <span class="chip">fim da fila</span>':''}</td>
-     <td style="white-space:nowrap">${callsHTML(c,max)}${c&&open?` <span class="ago" data-ago="${lastC}" data-late="${(st.cfg.intervalo||120)*1000}"></span>`:''}</td><td>${inspChip(r)}</td>
-     <td><input type="number" min="0" id="pe-${id}" data-f="peso" data-id="${id}" value="${peso==null?'':esc(peso)}" style="width:5.5em;${pesoBad?'border-color:var(--bad);color:var(--bad)':''}" aria-label="Peso em gramas"></td>
-     <td style="white-space:nowrap">${open?`<button class="btn small" data-act="call" data-a="i" data-id="${id}" ${c>=max&&r.st!=='rep'?'disabled':''}>${c?(r.st==='rep'?'Chamar de novo':(c+1)+'ª chamada'):'Chamar'}</button> <button class="btn small" data-act="insp" data-k="ok" data-id="${id}">Aprovada</button> <button class="btn small" data-act="insp" data-k="rep" data-id="${id}">Reprovada</button> <button class="btn small" data-act="adiar" data-q="I" data-id="${id}" title="Está disputando outra modalidade">Fim da fila</button>${c>=max?` <button class="btn small danger" data-act="insp" data-k="falta" data-id="${id}">Não apresentou</button>`:''}`
-       :`<button class="btn small" data-act="insp" data-k="" data-id="${id}">Desfazer</button>`}</td></tr>`}).join('')}
-  </tbody></table></div></div>`}
+${last}</div>
+   ${st.fase==='provas'?`<div class="panel"><button class="btn bigb" data-act="callMany">📣 Chamar várias equipes…</button></div>`+vChamProvas(st,tm):vChamInsp(st,tm)}</div>`}
+function pesoChip(p){if(p==null||p==='')return'';const v=+String(p).replace(',','.');if(!isFinite(v))return'';return v>1575?'<span class="chip bad">acima de 1.575 g</span>':'<span class="chip ok">peso ok</span>'}
+function pesoIn(id,r){return`<label class="pesof"><input type="text" inputmode="decimal" id="pe-${id}" data-f="peso" data-id="${id}" value="${r.peso==null?'':esc(String(r.peso).replace('.',','))}" placeholder="peso" aria-label="Peso em gramas"><span>g</span></label>${pesoChip(r.peso)}`}
+function vChamInsp(st,tm){const max=st.cfg.chamadas||3;const ids=ordered(st,st.adiI);const R=id=>st.insp[id]||{};const nC=id=>(R(id).c||[]).length;
+  const act=ids.filter(id=>{const t=tm[id];return t&&!t.aus&&!t.desc});
+  const chamadas=act.filter(id=>{const s=R(id).st;return(!s||s==='rep')&&nC(id)>0});
+  const aguard=act.filter(id=>!R(id).st&&nC(id)===0);
+  const feitas=act.filter(id=>['ok','falta'].includes(R(id).st));
+  const fora=ids.filter(id=>{const t=tm[id];return t&&(t.aus||t.desc)});
+  const prox=aguard[0];const nOk=feitas.filter(id=>R(id).st==='ok').length;
+  const head=`<div class="panel"><div class="row"><div class="grow"><h2>Inspeção técnica</h2><p class="hint">5.2: três chamadas, com cerca de 2 minutos entre elas. Robô reprovado pode ser ajustado em até 3 minutos. Quem não apresentar o robô até a última chamada perde as provas. Outra modalidade: “Fim da fila”, sem penalidade (5.4). Peso até 1.575 g; dimensões ${st.key==='labirinto'?'15 × 15 cm, altura livre':'25 × 25 × 25 cm'}.</p></div></div>
+   <div class="row" style="margin-top:10px;gap:8px">${prox?`<button class="btn primary bigb" data-act="call" data-a="i" data-id="${prox}">Chamar a próxima: ${pad2(ordNum(st,prox))} · ${esc(tname(tm,prox))}</button>`:''}<button class="btn bigb" data-act="callMany">📣 Chamar várias equipes…</button></div>
+   <div class="row" style="margin-top:10px"><span class="chip acc">na chamada <b class="num">${chamadas.length}</b></span><span class="chip">aguardando <b class="num">${aguard.length}</b></span><span class="chip ok">aprovadas <b class="num">${nOk}</b></span><span class="chip bad">não apresentaram <b class="num">${feitas.length-nOk}</b></span></div></div>`;
+  const cardNow=id=>{const t=tm[id],r=R(id),c=nC(id),lastC=c?r.c[c-1]:0;
+    return`<div class="irow now"><span class="io">${pad2(ordNum(st,id))}</span><div class="in"><b>${esc(t.nome)}</b><span class="campus">${esc(t.campus)}</span>
+      <div class="ist">${callsHTML(c,max)} <span class="ago" data-ago="${lastC}" data-late="${(st.cfg.intervalo||120)*1000}"></span> ${inspChip(r)}${st.adiI.includes(id)?' <span class="chip">fim da fila</span>':''}</div></div>
+      <div class="ia">${pesoIn(id,r)}<div class="acts"><button class="btn go" data-act="insp" data-k="ok" data-id="${id}">✓ Aprovada</button><button class="btn" data-act="insp" data-k="rep" data-id="${id}">Reprovada (3 min)</button>
+        <button class="btn" data-act="call" data-a="i" data-id="${id}" ${c>=max&&r.st!=='rep'?'disabled':''}>${r.st==='rep'?'Chamar de novo':Math.min(c+1,max)+'ª chamada'}</button><button class="btn" data-act="adiar" data-q="I" data-id="${id}" title="Está disputando outra modalidade">Fim da fila</button>${c>=max?`<button class="btn danger" data-act="insp" data-k="falta" data-id="${id}">Não apresentou</button>`:''}</div></div></div>`};
+  const cardWait=(id,i)=>{const t=tm[id];return`<div class="irow"><span class="io">${pad2(ordNum(st,id))}</span><div class="in"><b>${esc(t.nome)}</b><span class="campus">${esc(t.campus)}${st.adiI.includes(id)?' · fim da fila':''}</span></div>
+      <div class="ia"><div class="acts"><button class="btn ${i===0?'primary':''}" data-act="call" data-a="i" data-id="${id}">Chamar</button><button class="btn" data-act="adiar" data-q="I" data-id="${id}" title="Está disputando outra modalidade">Fim da fila</button></div></div></div>`};
+  const cardDone=id=>{const t=tm[id],r=R(id);return`<div class="irow done"><span class="io">${pad2(ordNum(st,id))}</span><div class="in"><b>${esc(t.nome)}</b><span class="campus">${esc(t.campus)}</span></div>
+      <div class="ia">${inspChip(r)}${r.peso!=null&&r.peso!==''?` <span class="chip">${esc(String(r.peso).replace('.',','))} g</span>`:''}<button class="btn small" data-act="insp" data-k="" data-id="${id}">Desfazer</button></div></div>`};
+  return head+`<div class="panel"><h2>Na chamada agora <span class="campus">(${chamadas.length})</span></h2><p class="hint" style="margin:0 0 8px">Quem foi chamado aparece aqui até ser aprovado, reprovado ou marcado como “não apresentou”. Digite o peso e confirme.</p><div class="ilist">${chamadas.map(cardNow).join('')||'<div class="empty">Ninguém sendo chamado agora.</div>'}</div></div>
+   <div class="panel"><h2>Aguardando chamada <span class="campus">(${aguard.length})</span></h2><div class="ilist" style="margin-top:8px">${aguard.map(cardWait).join('')||'<div class="empty">Todas as equipes já foram chamadas.</div>'}</div></div>
+   ${feitas.length?`<details class="panel"><summary><h2 style="display:inline">Já resolvidas <span class="campus">(${feitas.length}: ${nOk} aprovadas)</span></h2></summary><div class="ilist" style="margin-top:8px">${feitas.map(cardDone).join('')}</div></details>`:''}
+   ${fora.length?`<details class="panel"><summary><h2 style="display:inline">Ausentes ou desclassificadas <span class="campus">(${fora.length})</span></h2></summary><div class="ilist" style="margin-top:8px">${fora.map(id=>`<div class="irow done"><span class="io">${pad2(ordNum(st,id))}</span><div class="in"><b>${esc(tm[id].nome)}</b><span class="campus">${esc(tm[id].campus)}</span></div><div class="ia"><span class="chip warn">${tm[id].aus?'ausente':'desclassificada'}</span></div></div>`).join('')}</div></details>`:''}`}
+/* ----- Chamar várias equipes (escolher quem aparece no telão) ----- */
+function cmGroups(st){const tm=tmOf(st);const act=ordered(st,st.adiI).filter(id=>teamOk(st,id));const R=id=>st.insp[id]||{};const insp=st.fase!=='provas';
+  return{todas:act,nao:act.filter(id=>insp?!((R(id).c||[]).length)&&!R(id).st:!isDone(st,id,'f')&&(st.rel.f||{}).id!==id&&(st.rel.d||{}).id!==id),pend:act.filter(id=>insp?R(id).st!=='ok':!(isDone(st,id,'f')&&isDone(st,id,'d')))}}
+function openCallMany(){const st=S[ui.mod];const g=cmGroups(st);ui.cm={mode:g.nao.length?'nao':'pend',sel:new Set(g.nao.length?g.nao:g.pend)};paintCM();const d=$('#dlg');if(!d.open)d.showModal()}
+function paintCM(){const st=S[ui.mod],tm=tmOf(st);const g=cmGroups(st);const insp=st.fase!=='provas';const d=$('#dlg');d.className='wide';d.style.width='min(760px, calc(100vw - 24px))';
+  const opt=[['nao',insp?'Só as que ainda não foram chamadas':'Só as que ainda não fizeram a prova',g.nao.length],['pend',insp?'Todas que ainda não passaram na inspeção':'Todas que ainda têm prova a fazer',g.pend.length],['todas','Todas as equipes presentes',g.todas.length],['escolher','Escolher uma a uma',ui.cm.sel.size]];
+  d.innerHTML=`<div class="dlg"><div class="row"><h2 class="grow" style="font-size:22px">Chamar várias equipes</h2><button class="btn" data-act="dlgClose">Fechar</button></div>
+   <div class="cmopts">${opt.map(([k,l,n])=>`<button class="mod-tab" data-act="cmMode" data-k="${k}" aria-pressed="${ui.cm.mode===k}">${l} <span class="count">${n}</span></button>`).join('')}</div>
+   <div class="cmlist">${g.todas.map(id=>`<label class="cmi"><input type="checkbox" data-act="cmTog" data-id="${id}" ${ui.cm.sel.has(id)?'checked':''}><span class="io">${pad2(ordNum(st,id))}</span><b>${esc(tname(tm,id))}</b><span class="campus">${esc(tcamp(tm,id))}${insp&&((st.insp[id]||{}).c||[]).length?' · '+(st.insp[id].c.length)+'ª chamada feita':''}${insp&&(st.insp[id]||{}).st==='ok'?' · aprovada':''}</span></label>`).join('')}</div>
+   <p class="hint" style="margin:0">${insp?'Na inspeção, conta como mais uma chamada para cada equipe escolhida (até 3).':'O telão mostra as equipes escolhidas, com aviso sonoro.'}</p>
+   <div class="row" style="justify-content:flex-end"><button class="btn primary bigb" data-act="cmGo" ${ui.cm.sel.size?'':'disabled'}>📣 Chamar ${ui.cm.sel.size} equipe(s) no telão</button></div></div>`}
 function laneHTML(st,tm,ar){const R=st.rel[ar]||{};const id=R.id;const fila=filaArena(st,ar);
   let rows='';if(id){const a=(st.prov[id]||{})[ar]||{};const x=arScore(st.key,a,ar);const n=(st.callP[ar+':'+id]||[]).length;
     rows+=`<tr class="now"><td class="n">${pad2(ordNum(st,id))}</td><td><b>${esc(tname(tm,id))}</b><br><span class="campus">${esc(tcamp(tm,id))}</span></td><td>${a.feito?`<span class="chip ok">encerrada · ${x?x.pts:0} pts</span>`:`<span class="clk3" data-clk="${st.key}:${ar}">0:00,0</span> <span class="stt" data-st="${st.key}:${ar}"></span><br><span class="campus">${n}ª chamada</span>`}</td><td style="white-space:nowrap"><button class="btn small" data-act="call" data-a="${ar}" data-id="${id}">Chamar de novo</button></td></tr>`}
@@ -20995,17 +21087,18 @@ function loadDocx(){if(window.docx)return Promise.resolve(window.docx);if(docxLi
 /* ===== Telão ===== */
 let rot=0,seen={},som=load('som')!==false,popUntil=0,audioOk=false;
 function tvKey(){if(TV.modo!=='auto'&&modInfo(TV.modo))return TV.modo;return MODS.slice().sort((a,b)=>(S[b.key].atualizado||0)-(S[a.key].atualizado||0))[0].key}
-function tvVista(st){if(reveal&&reveal.key===st.key)return'ordem';const h=location.hash.replace('#telao','').replace('-','');if(['chamada','arenas','classif','ordem'].includes(h))return h;if(TV.vista!=='auto')return TV.vista;
+function tvVista(st){if(reveal&&reveal.key===st.key)return'ordem';const h=location.hash.replace('#telao','').replace('-','');if(['chamada','arenas','classif','ordem','treino'].includes(h))return h;if(TV.vista!=='auto')return TV.vista;
   if(st.cham&&NOW()-st.cham.at<45000)return'chamada';
+  if(st.treino&&(st.treino.t0||remT(st.treino)<=0&&NOW()-(st.treino.at||0)<36e5&&elT(st.treino)>0)&&!ARS.some(ar=>relInfo(st,ar).run))return'treino';
   if(st.fase==='provas'&&ARS.some(ar=>relInfo(st,ar).run||auxInfo(st,ar)))return'arenas';
   if(!st.cham)return'ordem';
   const anyRes=st.equipes.some(t=>touched((st.prov[t.id]||{}).f));if(!anyRes)return st.fase==='provas'&&ARS.some(ar=>(st.rel[ar]||{}).id)?['chamada','arenas','ordem'][rot%3]:['chamada','ordem'][rot%2];
   return['chamada','arenas','classif','ordem'][rot%4]}
 function renderTV(){document.body.classList.add('tv');let key=tvKey();if(reveal&&(TV.modo==='auto'||TV.modo===reveal.key))key=reveal.key;const st=S[key],tm=tmOf(st),mi=modInfo(key);const vista=tvVista(st);
-  const ph={chamada:st.fase==='provas'?'Chamada · provas':'Chamada · inspeção técnica',arenas:'Provas ao vivo',classif:'Classificação',
+  const ph={chamada:st.fase==='provas'?'Chamada · provas':'Chamada · inspeção técnica',arenas:'Provas ao vivo',classif:'Classificação',treino:'Cronômetro',
     ordem:reveal&&reveal.key===key?(reveal.n<0?'Embaralhando as equipes':'Sorteio da ordem de passagem'):'Ordem de passagem'}[vista];
   let body='';if(!st.equipes.length)body=`<div class="tvempty">Aguardando as equipes de ${esc(mi.nome)}</div>`;
-  else body=vista==='chamada'?tvChamada(st,tm):vista==='arenas'?tvArenas(st,tm):vista==='ordem'?(reveal&&reveal.key===key&&reveal.n<0?tvShuffle(st,tm):tvOrdem(st,tm)):tvClassif(st,tm);
+  else body=vista==='treino'?tvTreino(st,tm):vista==='chamada'?tvChamada(st,tm):vista==='arenas'?tvArenas(st,tm):vista==='ordem'?(reveal&&reveal.key===key&&reveal.n<0?tvShuffle(st,tm):tvOrdem(st,tm)):tvClassif(st,tm);
   $('#app').innerHTML=`<div class="tvroot"><div class="tvhead"><span class="tvplate ifma"><img class="tvlg-ifma" src="${LG['lg-ifma']||''}" alt="Instituto Federal do Maranhão"></span><div class="tvtitle"><div class="ev">IV Campeonato de Robótica · Universo IF 2026</div><h1>${esc(mi.nome)}</h1></div><div class="tvright"><span class="tvplate"><img class="tvlg-pirpta" src="${LG['lg-pirpta']||''}" alt="Programa Institucional de Robótica, Programação e Tecnologias Aplicadas"></span><div class="tvmeta"><div class="ph">${ph}</div><div class="clock" data-hora="1"></div></div></div></div>${body}
    <div class="tvfoot"><span>PIRPTA-IFMA</span><span>${mode==='db'?esc(syncMsg):''}</span></div></div>
    <button class="tvsom" data-act="som">${som?'🔊 Som ligado':'🔇 Som desligado'}</button>${tvMenu()}${som&&!audioOk?'<div class="tvarm" data-act="arm">Toque ou clique na tela para ligar o som e a tela cheia</div>':''}`}
@@ -21031,9 +21124,9 @@ document.addEventListener('mousemove',()=>{if(isTV())wakeMenu()});
 function hop(txt){return esc(txt)}
 let popT=null;function showPop(key,c){const st=S[key],tm=tmOf(st);let el=document.getElementById('tvpop');if(!el){el=document.createElement('div');el.id='tvpop';document.body.appendChild(el)}
   let dur=9000,html='';
-  if(c.a==='all'){const L=st.equipes.filter(t=>!t.aus&&!t.desc);dur=Math.max(14000,L.length*450+6000);const n=Math.max(1,L.length);const W=window.innerWidth||1600,H=window.innerHeight||900;const cols=Math.max(2,Math.min(8,Math.ceil(Math.sqrt(n*1.7))));const rows=Math.ceil(n/cols);const fs=Math.max(11,Math.min(40,(H*0.6)/rows/3.1,(W*0.94)/cols/11.5));
-    html=`<div class="ffpop all" role="alert"><div class="k">Atenção, equipes</div><div class="t big">${hop(modInfo(key).nome)}</div><div class="d">${st.fase==='provas'?'Todas às arenas':'Todas para a inspeção técnica'}</div>
-      <div class="allg" style="font-size:${fs.toFixed(1)}px;grid-template-columns:repeat(${cols},minmax(0,1fr))">${L.map((t,i)=>`<div class="chipT still" style="animation-delay:${(.5+i*.06).toFixed(2)}s"><b>${pad2(i+1)} ${esc(t.nome)}</b><span>${esc(t.campus)}</span></div>`).join('')}</div></div>`}
+  if(c.a==='all'){const L=(c.ids?c.ids.map(id=>tm[id]).filter(Boolean):st.equipes.filter(t=>!t.aus&&!t.desc));dur=Math.max(14000,L.length*450+6000);const n=Math.max(1,L.length);const W=window.innerWidth||1600,H=window.innerHeight||900;const cols=Math.max(2,Math.min(8,Math.ceil(Math.sqrt(n*1.7))));const rows=Math.ceil(n/cols);const fs=Math.max(11,Math.min(40,(H*0.6)/rows/3.1,(W*0.94)/cols/11.5));
+    html=`<div class="ffpop all" role="alert"><div class="k">Atenção, equipes</div><div class="t big">${hop(modInfo(key).nome)}</div><div class="d">${st.fase==='provas'?'Às arenas':'Para a inspeção técnica'}</div>
+      <div class="allg" style="font-size:${fs.toFixed(1)}px;grid-template-columns:repeat(${cols},minmax(0,1fr))">${L.map((t,i)=>`<div class="chipT still" style="animation-delay:${(.5+i*.06).toFixed(2)}s"><b>${pad2(ordNum(st,t.id))} ${esc(t.nome)}</b><span>${esc(t.campus)}</span></div>`).join('')}</div></div>`}
   else{if(!tm[c.id])return;html=`<div class="ffpop" role="alert"><div class="k">Atenção, equipe</div><div class="n">${pad2(ordNum(st,c.id))}</div><div class="t">${hop(tname(tm,c.id))}</div><div class="c">${esc(tcamp(tm,c.id))}</div><div class="d">${c.a==='i'?'Inspeção técnica':AR[c.a]} · ${c.n}ª chamada</div></div>`}
   el.innerHTML=html;clearTimeout(popT);popT=setTimeout(()=>{el.innerHTML=''},dur)}
 /* Ordem de passagem no telão, no mesmo estilo das chaves do chaveamento (cartões com letra dimensionada para caber na tela) */
@@ -21063,9 +21156,9 @@ function tvChamada(st,tm){const c=st.cham;const fresh=id=>c&&c.id===id&&NOW()-c.
       const ex=a.feito?`prova encerrada · <b>${x?x.pts:0} pts</b>`:`${n}ª chamada · <b data-clk="${st.key}:${ar}"></b> · <span data-st="${st.key}:${ar}"></span>`;return ffCard(st,tm,id,AR[ar],ex,fresh(id))}).join('');
     const fF=filaArena(st,'f'),fD=filaArena(st,'d');const items=[];fD.slice(0,2).forEach(id=>items.push([id,'arena difícil']));fF.slice(0,6-items.length).forEach(id=>items.push([id,'arena fácil']));
     next=items.map(([id,d])=>`<li><span class="o">${pad2(ordNum(st,id))}</span><div><b>${esc(tname(tm,id))}</b><span>${esc(tcamp(tm,id))} · ${d}</span></div></li>`).join('')}
-  else{const called=st.equipes.map(t=>t.id).filter(id=>{const r=st.insp[id]||{};return teamOk(st,id)&&(r.c||[]).length&&(r.st===''||r.st==null||r.st==='rep')}).sort((a,b)=>{const la=st.insp[a].c.slice(-1)[0],lb=st.insp[b].c.slice(-1)[0];return lb-la}).slice(0,3);
+  else{const calledAll=st.equipes.map(t=>t.id).filter(id=>{const r=st.insp[id]||{};return teamOk(st,id)&&(r.c||[]).length&&(r.st===''||r.st==null||r.st==='rep')}).sort((a,b)=>{const la=st.insp[a].c.slice(-1)[0],lb=st.insp[b].c.slice(-1)[0];return lb-la});const called=calledAll.slice(0,3);
     now=called.map(id=>{const r=st.insp[id];return ffCard(st,tm,id,'Inspeção técnica',r.st==='rep'?'reprovada: ajuste até <b data-cd="'+((r.rep||0)+180000)+'"></b>':`${r.c.length}ª chamada`,fresh(id))}).join('');
-    const fila=filaInsp(st).filter(id=>!called.includes(id));next=fila.slice(0,7).map(id=>`<li><span class="o">${pad2(ordNum(st,id))}</span><div><b>${esc(tname(tm,id))}</b><span>${esc(tcamp(tm,id))}</span></div></li>`).join('');
+    const fila=filaInsp(st).filter(id=>!((st.insp[id]||{}).c||[]).length);if(calledAll.length>3)now+=`<div class="ffmore">+ ${calledAll.length-3} equipe(s) também chamada(s): ${calledAll.slice(3).map(id=>esc(tname(tm,id))).join(' · ')}</div>`;next=fila.slice(0,7).map(id=>`<li><span class="o">${pad2(ordNum(st,id))}</span><div><b>${esc(tname(tm,id))}</b><span>${esc(tcamp(tm,id))}</span></div></li>`).join('');
     const ok=st.equipes.filter(t=>(st.insp[t.id]||{}).st==='ok').length;nTitle=`Prepare-se <span style="float:right;color:var(--tv-ok)">${ok} na quarentena</span>`}
   return`<div class="ff"><section class="ffcol now"><h2>Chamando</h2>${now||'<div class="ffempty">Aguardando a próxima chamada</div>'}</section><section class="ffcol"><h2>${nTitle}</h2>${next?`<ol class="ffq">${next}</ol>`:'<div class="ffempty">Fila vazia</div>'}</section></div>`}
 function tvArenas(st,tm){const mi=modInfo(st.key);const pan=ARS.map(ar=>{const id=(st.rel[ar]||{}).id;if(!id)return`<section class="arp"><div class="arh">${AR[ar]}<span>máx. ${fmtT(mi.max[ar])}</span></div><div class="ffempty">Arena livre</div></section>`;
@@ -21115,6 +21208,52 @@ function tick(){const now=NOW();
   document.querySelectorAll('[data-hora]').forEach(n=>n.textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}))}
 setInterval(tick,100);
 
+/* ===== Cronômetro de treino / calibração (contagem regressiva com horas) ===== */
+function fmtH(ms){ms=Math.max(0,Math.ceil(ms/1000))*1000;const s=ms/1000,h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return h?h+':'+String(m).padStart(2,'0')+':'+String(r).padStart(2,'0'):m+':'+String(r).padStart(2,'0')}
+function durTxt(ms){const m=Math.round(ms/60000),h=Math.floor(m/60),r=m%60;return h?(h+' h'+(r?' '+r+' min':'')):m+' min'}
+const elT=T=>T?Math.min(T.dur,(T.acc||0)+(T.t0?NOW()-T.t0:0)):0,remT=T=>T?Math.max(0,T.dur-elT(T)):0;
+const trf={lab:'Tempo de treino',h:0,m:10,eq:''};
+function vTreino(st,tm){const T=st.treino;const L=st.equipes.filter(t=>!t.aus&&!t.desc);
+  const clock=T?`<div class="panel"><div class="row"><div class="grow"><h2>${esc(T.label)}</h2><span class="campus" style="font-size:15px">${T.eq&&tm[T.eq]?'Equipe: '+esc(tm[T.eq].nome)+' · ':''}duração ${durTxt(T.dur)}</span></div><span class="stt" data-trst></span></div>
+     <div class="trclk" data-tr>${fmtH(remT(T))}</div><div class="bar" style="margin-top:8px"><i data-trbar></i></div>
+     <div class="row" style="margin-top:14px;gap:8px">${T.t0?`<button class="btn bigb" data-act="trPause">Pausar</button>`:`<button class="btn primary bigb" data-act="trStart" ${remT(T)<=0?'disabled':''}>${elT(T)>0?'Continuar':'Iniciar'}</button>`}
+      <button class="btn" data-act="trAdd" data-d="60000">+1 min</button><button class="btn" data-act="trAdd" data-d="-60000" ${T.dur<=60000?'disabled':''}>−1 min</button><button class="btn" data-act="trAdd" data-d="3600000">+1 h</button><button class="btn" data-act="trReset">Reiniciar</button><button class="btn danger" data-act="trOff">Encerrar e tirar do telão</button></div></div>`:'';
+  return`<div class="section">${clock}<div class="panel"><h2>${T?'Começar outro cronômetro':'Cronômetro de treino e calibração'}</h2>
+    <p class="hint">O telão mostra um cronômetro gigante em contagem regressiva (menu do telão, opção “Treino”). Use para o tempo de treino nas arenas, calibração, ajustes ou intervalo.</p>
+    <div class="trform">
+     <label class="f">O que é<input type="text" id="tr-lab" value="${esc(trf.lab)}"></label>
+     <label class="f">Horas<input type="text" inputmode="numeric" id="tr-h" value="${trf.h}" class="num2"></label>
+     <label class="f">Minutos<input type="text" inputmode="numeric" id="tr-m" value="${trf.m}" class="num2"></label>
+     <label class="f">Equipe (opcional)<select id="tr-eq"><option value="">— todas / nenhuma —</option>${L.map(t=>`<option value="${t.id}" ${trf.eq===t.id?'selected':''}>${pad2(ordNum(st,t.id))} · ${esc(t.nome)}</option>`).join('')}</select></label>
+     <button class="btn primary bigb" data-act="trNew">Criar e mostrar no telão</button></div>
+    <div class="row" style="margin-top:12px;gap:8px"><span class="hint" style="margin:0">Atalhos:</span>${[['Tempo de treino',0,10],['Calibração',0,5],['Treino nas arenas',1,0],['Intervalo',0,15],['Almoço',1,30]].map(([l,h,m])=>`<button class="btn small" data-act="trPreset" data-l="${l}" data-h="${h}" data-m="${m}">${l} · ${durTxt((h*60+m)*60000)}</button>`).join('')}</div></div></div>`}
+function tvTreino(st,tm){const T=st.treino;if(!T)return`<div class="tvempty">Nenhum cronômetro de treino agora</div>`;return`<div class="cxtreino"><div class="cxtl">${esc(T.label)}</div>${T.eq&&tm[T.eq]?`<div class="cxeq">Equipe: <b>${esc(tm[T.eq].nome)}</b></div>`:''}
+   <div class="cxring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" class="bg"/><circle cx="50" cy="50" r="45" class="fg" data-tring/></svg><div class="cxbig" data-tr>${fmtH(remT(T))}</div></div>
+   <div class="stt tvst" data-trst></div></div>`}
+let trEndSeen=false;
+function trTick(){const st=S[isTV()?tvKey():ui.mod];if(!st)return;const T=st.treino;const rem=remT(T);
+  document.querySelectorAll('[data-tr]').forEach(n=>{n.textContent=T?(rem>0?fmtH(rem):'0:00'):'';n.classList.toggle('hh',!!T&&rem>=3600000);n.classList.toggle('last',!!T&&rem<=60000&&rem>10000);n.classList.toggle('final',!!T&&rem<=10000&&rem>0);n.classList.toggle('over',!!T&&rem<=0)});
+  document.querySelectorAll('[data-trbar]').forEach(n=>n.style.width=T?(100*Math.min(1,elT(T)/T.dur)).toFixed(2)+'%':'0');
+  document.querySelectorAll('[data-tring]').forEach(n=>{const f=T?Math.max(0,rem/T.dur):0;n.style.strokeDashoffset=(283*(1-f)).toFixed(1);n.classList.toggle('last',rem<=60000&&rem>10000);n.classList.toggle('final',rem<=10000)});
+  document.querySelectorAll('[data-trst]').forEach(n=>{const t=!T?'':rem<=0?'Tempo esgotado':T.t0?'Em andamento':elT(T)>0?'Pausado':'Pronto para iniciar';if(n.textContent!==t)n.textContent=t;n.classList.add('stt');n.classList.toggle('bad',!!T&&rem<=0);n.classList.toggle('run',!!T&&!!T.t0&&rem>0);n.classList.toggle('warn',!!T&&!T.t0&&rem>0&&elT(T)>0)});
+  if(!isTV()){if(T&&T.t0&&rem<=0&&!(mode==='srv'&&srvNeedPin&&!srvPinOk))mutate(ui.mod,s=>{s.treino.acc=s.treino.dur;s.treino.t0=null},true)}
+  else{const end=!!T&&rem<=0&&elT(T)>0;if(end&&!trEndSeen&&som)[0,.45,.9].forEach(d=>{bell(880,d,.5,.9);tone(880,d,.35,.5,'square')});trEndSeen=end}}
+setInterval(trTick,100);
+document.addEventListener('input',e=>{const el=e.target;if(!el.id||!el.id.startsWith('tr-'))return;const v=el.value;if(el.id==='tr-lab')trf.lab=v;else if(el.id==='tr-h')trf.h=parseInt(v.replace(/\D/g,''),10)||0;else if(el.id==='tr-m')trf.m=parseInt(v.replace(/\D/g,''),10)||0});
+document.addEventListener('change',e=>{if(e.target.id==='tr-eq')trf.eq=e.target.value});
+function trCreate(lab,h,m){const ms=Math.max(1,Math.min(24*60,h*60+m))*60000;trf.lab=lab;trf.h=h;trf.m=m;const eq=trf.eq||null;mutate(ui.mod,s=>{s.treino={label:lab,dur:ms,acc:0,t0:null,eq,at:NOW()}});toast(lab+' · '+durTxt(ms)+': aparece no telão')}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||!/^tr[A-Z]/.test(b.dataset.act))return;const a=b.dataset.act;const st=S[ui.mod];
+  const num=id=>Math.max(0,parseInt(String(($(id)||{}).value||'0').replace(/\D/g,''),10)||0);
+  switch(a){
+  case'trNew':{trf.eq=($('#tr-eq')||{}).value||'';const lab=(($('#tr-lab')||{}).value||'').trim()||'Tempo de treino';const h=num('#tr-h'),m=num('#tr-m');if(!h&&!m){toast('Informe horas ou minutos');return}trCreate(lab,h,m);break}
+  case'trPreset':trf.eq=($('#tr-eq')||{}).value||'';trCreate(b.dataset.l,+b.dataset.h,+b.dataset.m);break;
+  case'trStart':if(!st.treino)return;mutate(ui.mod,s=>{if(!s.treino.t0)s.treino.t0=NOW()},true);break;
+  case'trPause':if(!st.treino)return;mutate(ui.mod,s=>{const T=s.treino;if(T.t0){T.acc=(T.acc||0)+NOW()-T.t0;T.t0=null}},true);break;
+  case'trAdd':{if(!st.treino)return;const d=+b.dataset.d;mutate(ui.mod,s=>{s.treino.dur=Math.max(60000,s.treino.dur+d)},true);break}
+  case'trReset':mutate(ui.mod,s=>{s.treino.acc=0;s.treino.t0=null},true);break;
+  case'trOff':mutate(ui.mod,s=>{s.treino=null});break;
+  }render()});
+
 /* ===== Ações ===== */
 function parseTeams(txt,existing,pfx){const seenT=new Set(existing.map(t=>(t.nome+'|'+normCampus(t.campus)).toLowerCase()));const out=[];
   txt.split(/\r?\n/).forEach(l=>{if(!l.trim())return;const p=l.split(/\t|;/).map(s=>s.trim());const nome=p[0];const campus=p[1]||'';if(!nome||/^equipe$/i.test(nome))return;
@@ -21127,7 +21266,9 @@ function doCall(s,a,id){const now=NOW();let n;
   else{const k=a+':'+id;(s.callP[k]=s.callP[k]||[]).push(now);n=s.callP[k].length;s.fase='provas';s.adiP=s.adiP.filter(x=>x!==id);
     if((s.rel[a]||{}).id!==id){s.rel[a]={id,p:{acc:0,t0:null},x:null}}if(ui.edit)ui.edit[a]=null}
   s.cham={seq:((s.cham&&s.cham.seq)||0)+1,at:now,a,id,n}}
-function doCallAll(s){const now=NOW();s.cham={seq:((s.cham&&s.cham.seq)||0)+1,at:now,a:'all',id:null,n:1}}
+function doCallAll(s,ids){const now=NOW();ids=ids||ordered(s,s.adiI).filter(id=>teamOk(s,id));const max=s.cfg.chamadas||3;
+  if(s.fase!=='provas')ids.forEach(id=>{const r=s.insp[id]=s.insp[id]||{c:[],st:''};r.c=r.c||[];if(r.st==='rep'){r.st='';r.c=[]}if(r.st!=='ok'&&r.st!=='falta'&&r.c.length<max)r.c.push(now)});
+  s.cham={seq:((s.cham&&s.cham.seq)||0)+1,at:now,a:'all',id:null,n:1,ids:ids.slice()}}
 const FMAX={m:3};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,st=S[ui.mod],tm=tmOf(st);
   if(a!=='ask'&&a!=='cancel'&&!['sortear','delTeam','tReset','zerar','nf','ds'].includes(a))ui.confirm=null;
@@ -21190,20 +21331,24 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
     const bk=JSON.stringify({tipo:'chaveamento-iv-campeonato-modalidade',modalidade:k,nome:modInfo(k).nome,gerado:new Date().toISOString(),motivo:'backup automático antes de zerar',estado:S[k]},null,1);
     saveFile(`Backup_antes_de_zerar_${modInfo(k).nome.replace(/[^A-Za-zÀ-ú0-9]+/g,'_')}_${stamp()}.json`,bk,'Backup salvo');try{$('#dlg').close()}catch(err){}
     mutate(k,s=>{const n=normalize(k,base);Object.keys(s).forEach(x=>delete s[x]);Object.assign(s,n)});ui.edit={f:null,d:null};TV.vista='auto';saveTV();toast('Backup .json baixado e dados zerados');return}
+  case'callMany':openCallMany();return;
+  case'cmMode':{const g=cmGroups(st);const k=b.dataset.k;ui.cm.mode=k;if(k!=='escolher')ui.cm.sel=new Set(g[k]);paintCM();return}
+  case'cmTog':{const id=b.dataset.id;if(ui.cm.sel.has(id))ui.cm.sel.delete(id);else ui.cm.sel.add(id);ui.cm.mode='escolher';setTimeout(paintCM,0);return}
+  case'cmGo':{const ids=ordered(st,st.adiI).filter(id=>ui.cm.sel.has(id));if(!ids.length)return;try{$('#dlg').close()}catch(e){}mutate(ui.mod,s=>doCallAll(s,ids));if(isTV())checkCall(ui.mod);else toast('Chamando '+ids.length+' equipe(s) no telão');return}
   case'callAll':mutate(ui.mod,s=>doCallAll(s));if(isTV())checkCall(ui.mod);else toast('Chamando todas as equipes');return;
   case'som':som=!som;store('som',som);if(som){audio();chime()}render();return;
   case'arm':audio();tvFull();chime();render();return;
   case'exitTV':{const p=document.getElementById('tvpop');if(p)p.innerHTML=''}try{document.fullscreenElement&&document.exitFullscreen()}catch(err){}history.replaceState(null,'',location.pathname+location.search);render();return;
   }
   render()});
-const LIVE=['pn','pv','peso','acfg'];
+const LIVE=['pn','pv'];
 document.addEventListener('input',e=>{const el=e.target;if(LIVE.includes(el.dataset.f))onField(el)});
 document.addEventListener('change',e=>{const el=e.target;if(LIVE.includes(el.dataset.f))return;onField(el)});
 function onField(el){const f=el.dataset.f;if(!f&&el.id!=='importf')return;
   switch(f){
   case'tnome':mutate(ui.mod,s=>{s.equipes.find(t=>t.id===el.dataset.id).nome=el.value.trim()});break;
   case'tcampus':mutate(ui.mod,s=>{s.equipes.find(t=>t.id===el.dataset.id).campus=el.value.trim()});break;
-  case'peso':mutate(ui.mod,s=>{const r=s.insp[el.dataset.id]=s.insp[el.dataset.id]||{c:[],st:''};r.peso=el.value===''?null:+el.value});if(+el.value>1575)toast('Acima de 1.575 g: reprovado no peso');break;
+  case'peso':{const v=el.value.trim().replace(',','.');mutate(ui.mod,s=>{const r=s.insp[el.dataset.id]=s.insp[el.dataset.id]||{c:[],st:''};r.peso=v===''?null:(isFinite(+v)?+v:v)});if(+v>1575)toast('Acima de 1.575 g: reprovado no peso');break}
   case'arTeam':{const ar=el.dataset.ar,id=el.value;const st=S[ui.mod];if(relInfo(st,ar).run){toast('Pause o relógio antes de trocar a equipe');render();return}
     mutate(ui.mod,s=>{s.rel[ar]=id?{id,p:{acc:0,t0:null},x:null}:{}});ui.edit[ar]=null;break}
   case'pn':{const{ar,id,k}=el.dataset;const st=S[ui.mod];const C=st.cfg.arena[ar];const lim={m:3,o:C.obs,dc:C.desc,c:C.blocos,e:C.blocos}[k];let v=I(el.value);if(st.key==='entrega'&&lim!=null&&v>lim){v=lim;toast('Máximo nesta arena: '+lim)}if(k==='m'&&v>3)v=3;

@@ -21289,6 +21289,8 @@ function placaSVG(k){const ar=d=>`<circle cx="50" cy="50" r="46" fill="#1d5fcf" 
 const carSVG='<svg viewBox="0 0 64 40" aria-hidden="true"><rect x="6" y="2" width="10" height="8" rx="2" fill="#111"/><rect x="44" y="2" width="10" height="8" rx="2" fill="#111"/><rect x="6" y="30" width="10" height="8" rx="2" fill="#111"/><rect x="44" y="30" width="10" height="8" rx="2" fill="#111"/><rect x="2" y="7" width="60" height="26" rx="9" fill="#ff7a33"/><rect x="34" y="11" width="16" height="18" rx="4" fill="#ffd7bf"/><circle cx="59" cy="12" r="2.5" fill="#fff6c9"/><circle cx="59" cy="28" r="2.5" fill="#fff6c9"/></svg>';
 function fmt(ms,t){ms=Math.max(0,ms);const s=Math.floor(ms/1000),m=Math.floor(s/60),r=s%60;return m+':'+String(r).padStart(2,'0')+(t?','+Math.floor(ms%1000/100):'')}
 function fmtUp(ms){return fmt(Math.ceil(Math.max(0,ms)/1000)*1000)}
+function fmtH(ms){ms=Math.max(0,Math.ceil(ms/1000))*1000;const s=ms/1000,h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return h?h+':'+String(m).padStart(2,'0')+':'+String(r).padStart(2,'0'):m+':'+String(r).padStart(2,'0')}
+function durTxt(ms){const m=Math.round(ms/60000),h=Math.floor(m/60),r=m%60;return h?(h+' h'+(r?' '+r+' min':'')):m+' min'}
 /* presença por prova: "faltou" numa prova tira a equipe só da fila daquela prova; ausente nas duas = ausente no site todo */
 function faltou(st,P,id){return!!(((st.faltou||{})[P]||{})[id])}
 function present(st,P){return st.equipes.filter(t=>!t.aus&&!t.desc&&!(P&&faltou(st,P,t.id))).slice().sort((a,b)=>a.nome.localeCompare(b.nome,'pt'))}
@@ -21352,18 +21354,18 @@ function vLive(st,tm,L){const e=elL(L);const cp=(L.cps||[]).length;const over=e>
       <span class="hint" style="margin:0">Checkpoints e infrações válidos ficam preservados ao encerrar (9.6). Tudo aparece no telão na hora.</span></div></div></div>`}
 
 window.vTreino=function(st,tm){const T=st.treino;const min=cx.min||10;const L2=present(st);
-  const clock=T?`<div class="panel"><div class="row"><div class="grow"><h2>${esc2(T.label)}</h2><span class="campus" style="font-size:15px">${T.eq&&tm[T.eq]?'Equipe na pista: '+esc2(tm[T.eq].nome)+' · ':''}duração ${fmt(T.dur)}</span></div><span class="stt" data-cx-trst></span></div>
+  const clock=T?`<div class="panel"><div class="row"><div class="grow"><h2>${esc2(T.label)}</h2><span class="campus" style="font-size:15px">${T.eq&&tm[T.eq]?'Equipe na pista: '+esc2(tm[T.eq].nome)+' · ':''}duração ${durTxt(T.dur)}</span></div><span class="stt" data-cx-trst></span></div>
      <div class="row" style="margin-top:12px;align-items:center;gap:16px"><span class="cxclk" data-cx-tr>0:00</span></div><div class="bar" style="margin-top:8px"><i data-cx-trbar></i></div>
      <div class="row" style="margin-top:14px;gap:8px">${T.t0?`<button class="btn bigb" data-act="cxTPause">Pausar</button>`:`<button class="btn primary bigb" data-act="cxTStart" ${remT(T)<=0?'disabled':''}>${elT(T)>0?'Continuar':'Iniciar'}</button>`}
-      <button class="btn" data-act="cxTAdd" data-d="60000">+1 min</button><button class="btn" data-act="cxTAdd" data-d="-60000" ${T.dur<=60000?'disabled':''}>−1 min</button><button class="btn" data-act="cxTReset">Reiniciar</button><button class="btn danger" data-act="cxTOff">Encerrar e tirar do telão</button></div></div>`:'';
+      <button class="btn" data-act="cxTAdd" data-d="60000">+1 min</button><button class="btn" data-act="cxTAdd" data-d="3600000">+1 h</button><button class="btn" data-act="cxTAdd" data-d="-60000" ${T.dur<=60000?'disabled':''}>−1 min</button><button class="btn" data-act="cxTReset">Reiniciar</button><button class="btn danger" data-act="cxTOff">Encerrar e tirar do telão</button></div></div>`:'';
   return`<div class="section">${clock}<div class="panel"><h2>${T?'Começar outro cronômetro':'Cronômetro de treino e ajustes'}</h2>
     <p class="hint">O telão mostra um cronômetro gigante em contagem regressiva. 9.3: testes de calibração antes das provas, com oportunidades equivalentes e tempo de uso informado a todas as equipes; entre tentativas da mesma equipe, até 10 minutos de ajustes.</p>
     <div class="row" style="margin-top:12px;align-items:flex-end;gap:12px">
      <label class="f">O que é<input type="text" id="cx-lab" data-f="cxLab" value="${esc2(cx.lab||'Tempo de treino')}" style="min-width:14em;font-size:16px"></label>
-     <label class="f">Minutos<input type="number" id="cx-min" data-f="cxMin" min="1" max="240" value="${min}" style="width:6em;font-size:16px"></label>
+     <label class="f">Horas<input type="text" inputmode="numeric" id="cx-h" data-f="cxHM" value="${Math.floor(min/60)}" style="width:4.5em;font-size:16px"></label><label class="f">Minutos<input type="text" inputmode="numeric" id="cx-min" data-f="cxHM" value="${min%60}" style="width:4.5em;font-size:16px"></label>
      <label class="f">Equipe na pista (opcional)<select id="cx-teq" data-f="cxTEq" style="font-size:16px"><option value="">— nenhuma / todas —</option>${L2.map(t=>`<option value="${t.id}" ${cx.teq===t.id?'selected':''}>${esc2(t.nome)}</option>`).join('')}</select></label>
      <button class="btn primary bigb" data-act="cxTNew">Criar e mostrar no telão</button></div>
-    <div class="row" style="margin-top:10px;gap:8px"><span class="hint" style="margin:0">Atalhos:</span>${[['Tempo de treino',10],['Calibração',5],['Ajustes entre tentativas',10],['Intervalo',15]].map(([l,m])=>`<button class="btn small" data-act="cxTPreset" data-l="${l}" data-m="${m}">${l} · ${m} min</button>`).join('')}</div></div></div>`};
+    <div class="row" style="margin-top:10px;gap:8px"><span class="hint" style="margin:0">Atalhos:</span>${[['Tempo de treino',10],['Calibração',5],['Ajustes entre tentativas',10],['Intervalo',15],['Treino livre',60]].map(([l,m])=>`<button class="btn small" data-act="cxTPreset" data-l="${l}" data-m="${m}">${l} · ${durTxt(m*60000)}</button>`).join('')}</div></div></div>`};
 
 /* ---------- Barra fixa no topo da coordenação com os cronômetros ativos ---------- */
 const _renderApp=renderApp;
@@ -21423,7 +21425,7 @@ function cxTick(){const st=S[K];if(!st)return;const L=st.live,T=st.treino;
   document.querySelectorAll('[data-cx-rest]').forEach(n=>n.textContent=fmtUp(LIM-elL(L)));
   document.querySelectorAll('[data-cx-bar]').forEach(n=>n.style.width=(100*elL(L)/LIM).toFixed(2)+'%');
   document.querySelectorAll('[data-cx-st]').forEach(n=>{const[t,c]=stL(L);if(n.textContent!==t)n.textContent=t;n.classList.add('stt');['run','warn','bad','ok'].forEach(k=>n.classList.toggle(k,c===k))});
-  const rem=remT(T);document.querySelectorAll('[data-cx-tr]').forEach(n=>{n.textContent=T?(rem>0?fmtUp(rem):'0:00'):'';n.classList.toggle('last',T&&rem<=60000&&rem>10000);n.classList.toggle('final',T&&rem<=10000&&rem>0);n.classList.toggle('over',T&&rem<=0)});
+  const rem=remT(T);document.querySelectorAll('[data-cx-tr]').forEach(n=>{n.textContent=T?(rem>0?fmtH(rem):'0:00'):'';n.classList.toggle('hh',!!T&&rem>=3600000);n.classList.toggle('last',T&&rem<=60000&&rem>10000);n.classList.toggle('final',T&&rem<=10000&&rem>0);n.classList.toggle('over',T&&rem<=0)});
   document.querySelectorAll('[data-cx-trbar]').forEach(n=>n.style.width=T?(100*Math.min(1,elT(T)/T.dur)).toFixed(2)+'%':'0');
   document.querySelectorAll('[data-cx-ring]').forEach(n=>{const f=T?Math.max(0,rem/T.dur):0;n.style.strokeDashoffset=(283*(1-f)).toFixed(1);n.classList.toggle('last',rem<=60000&&rem>10000);n.classList.toggle('final',rem<=10000)});
   document.querySelectorAll('[data-cx-trst]').forEach(n=>{const t=!T?'':rem<=0?'Tempo esgotado':T.t0?'Em andamento':elT(T)>0?'Pausado':'Pronto para iniciar';if(n.textContent!==t)n.textContent=t;n.classList.add('stt');['run','warn','bad'].forEach(k=>n.classList.toggle(k,(k==='bad'&&rem<=0)||(k==='run'&&!!T&&!!T.t0&&rem>0)||(k==='warn'&&!!T&&!T.t0&&rem>0&&elT(T)>0)))});
@@ -21456,8 +21458,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
       else{F[p][id]=1;if(s.live&&!s.live.fim&&s.live.id===id&&s.live.P===p&&!s.live.t0&&!(s.live.acc>0))s.live=null}
       t.aus=!!(F.c[id]&&F.u[id])});toast(tname(tmOf(S[K]),id)+(v==='veio'?' veio para a ':' faltou na ')+PN[p].toLowerCase());break}
   case'cxCancel':ui.confirm=null;mutate(K,s=>{s.live=null});break;
-  case'cxTNew':case'cxTPreset':{const lab=a==='cxTPreset'?b.dataset.l:(($('#cx-lab')||{}).value||'Tempo de treino').trim()||'Tempo de treino';const m=a==='cxTPreset'?+b.dataset.m:Math.max(1,Math.min(240,parseInt(($('#cx-min')||{}).value,10)||10));
-    cx.lab=lab;cx.min=m;mutate(K,s=>{s.treino={label:lab,dur:m*60000,acc:0,t0:null,eq:cx.teq||null,at:now()}});toast(lab+' · '+m+' min: aparece no telão');break}
+  case'cxTNew':case'cxTPreset':{const lab=a==='cxTPreset'?b.dataset.l:(($('#cx-lab')||{}).value||'Tempo de treino').trim()||'Tempo de treino';const nv=id=>Math.max(0,parseInt(String(($(id)||{}).value||'0').replace(/\D/g,''),10)||0);const m=a==='cxTPreset'?+b.dataset.m:Math.max(1,Math.min(1440,nv('#cx-h')*60+nv('#cx-min')||10));
+    cx.lab=lab;cx.min=m;mutate(K,s=>{s.treino={label:lab,dur:m*60000,acc:0,t0:null,eq:cx.teq||null,at:now()}});toast(lab+' · '+durTxt(m*60000)+': aparece no telão');break}
   case'cxTStart':mutate(K,s=>{if(!s.treino.t0)s.treino.t0=now()},true);break;
   case'cxTPause':mutate(K,s=>{const T=s.treino;if(T.t0){T.acc=(T.acc||0)+now()-T.t0;T.t0=null}},true);break;
   case'cxTAdd':{const d=+b.dataset.d;mutate(K,s=>{s.treino.dur=Math.max(60000,s.treino.dur+d)},true);break}
@@ -21468,7 +21470,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   case'cxArm':audio();try{document.documentElement.requestFullscreen()}catch(err){}render();break;
   }});
 document.addEventListener('change',e=>{const el=e.target,f=el.dataset.f;if(!f||!f.startsWith('cx'))return;
-  if(f==='cxEq'){cx.id=el.value;cx.i=null;render()}else if(f==='cxI'){cx.i=+el.value;render()}else if(f==='cxMin'){cx.min=Math.max(1,parseInt(el.value,10)||10)}else if(f==='cxLab'){cx.lab=el.value}else if(f==='cxTEq'){cx.teq=el.value||null}});
+  if(f==='cxEq'){cx.id=el.value;cx.i=null;render()}else if(f==='cxI'){cx.i=+el.value;render()}else if(f==='cxHM'){const nv=id=>Math.max(0,parseInt(String(($(id)||{}).value||'0').replace(/\D/g,''),10)||0);cx.min=Math.max(1,nv('#cx-h')*60+nv('#cx-min'))}else if(f==='cxMin'){cx.min=Math.max(1,parseInt(el.value,10)||10)}else if(f==='cxLab'){cx.lab=el.value}else if(f==='cxTEq'){cx.teq=el.value||null}});
 document.addEventListener('pointerdown',()=>{if(isTV()){const w=audioOk;audio();if(!w&&audioOk)render();document.body.classList.remove('idle');clearTimeout(window.__cxIdle);window.__cxIdle=setTimeout(()=>document.body.classList.add('idle'),3500)}});
 document.addEventListener('mousemove',()=>{if(!isTV())return;document.body.classList.remove('idle');clearTimeout(window.__cxIdle);window.__cxIdle=setTimeout(()=>document.body.classList.add('idle'),3500)});
 document.addEventListener('keydown',e=>{if(!isTV())return;audio();const n=+e.key;if(n>=1&&n<=CXV.length){TV.cv=CXV[n-1][0];if(location.hash!=='#telao')history.replaceState(null,'','#telao');saveTV()}});
@@ -21525,9 +21527,12 @@ document.addEventListener('click',async e=>{const b=e.target.closest('[data-act]
   save=function(key){S[key].atualizado=Date.now();store('st:'+key,S[key]);if(key===K)sendDiff();render()};
   saveTV=async function(){store('tv',TV);try{await api('api/tv',{method:'POST',headers:{'Content-Type':'application/json','X-Pin':pin||''},body:JSON.stringify({tv:{modo:TV.modo,vista:TV.vista,cv:TV.cv||'auto'}})})}catch(e){}render()};
   if(j.tv){TV=Object.assign(TV,j.tv);if(LOCK)TV.modo=LOCK}
-  if(j.st){S[K]=normalize(K,j.st);store('st:'+K,S[K]);synced=JSON.stringify(S[K])}
+  const loc=S[K];const locNewer=!isTV()&&!!j.st&&!!loc&&(loc.equipes||[]).length>0&&(loc.atualizado||0)>(j.st.atualizado||0)&&(!needPin||!!pin);
+  if(j.st&&!locNewer){S[K]=normalize(K,j.st);store('st:'+K,S[K]);synced=JSON.stringify(S[K])}
   syncMsg='Sincronizado com o servidor';setDot('ok');render();
-  if(!isTV()&&needPin&&!(await check(pin)))askPin();
+  const okPin=!needPin||await check(pin);if(!isTV()&&!okPin)askPin();
+  if(locNewer){if(okPin){pushFull();toast('Este aparelho tinha lançamentos mais novos: enviados ao servidor')}else{S[K]=normalize(K,j.st);store('st:'+K,S[K]);synced=JSON.stringify(S[K]);render()}}
+  setInterval(()=>{api('healthz').catch(()=>{})},240000);
   if(!j.st&&(!needPin||pin))pushFull();
   stream();
   setInterval(()=>{if(_dn()-last>25000){syncMsg='Reconectando ao servidor…';setDot('busy');renderSync();stream()}},5000);
