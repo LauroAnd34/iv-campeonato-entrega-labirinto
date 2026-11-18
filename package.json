@@ -1,0 +1,9 @@
+{
+  "name": "campeonato-provas-sincronizadas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IV Campeonato de Robótica · Desafio de Entrega e Labirinto Inteligente com sincronização tablet → telão",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
