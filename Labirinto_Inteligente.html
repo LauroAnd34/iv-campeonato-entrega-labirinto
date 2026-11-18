@@ -21039,7 +21039,10 @@ async function saveFile(filename,data,okMsg){let dl=null;try{dl=window.claude&&w
   if(dl){try{await dl.save({filename,data});toast(okMsg)}catch(e){if(e&&e.code!=='declined')toast('Não foi possível salvar o arquivo')}return}
   try{const blob=data instanceof Blob?data:new Blob([data],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast(okMsg)}
   catch(e){toast('Este navegador não deixou baixar o arquivo')}}
-function doExportMod(key){const data=JSON.stringify({tipo:'chaveamento-iv-campeonato-modalidade',modalidade:key,nome:modInfo(key).nome,gerado:new Date().toISOString(),estado:S[key]},null,1);
+/* exportação para a planilha geral: em cada arena (f e d) de cada equipe vai "p" (pontuação final) e "t" (tempo em m:ss usado na classificação; não concluída = tempo máximo). O tempo digitado fica em "tdig". */
+function mss(sec){sec=Math.round(sec||0);return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
+function exportState(key){const st=JSON.parse(JSON.stringify(S[key]));Object.keys(st.prov||{}).forEach(id=>{ARS.forEach(ar=>{const a=st.prov[id][ar];const x=arScore(key,a,ar);if(!x)return;a.tdig=a.t==null?null:a.t;a.p=x.pts;a.t=mss(x.t)})});return st}
+function doExportMod(key){const data=JSON.stringify({tipo:'chaveamento-iv-campeonato-modalidade',modalidade:key,nome:modInfo(key).nome,gerado:new Date().toISOString(),estado:exportState(key)},null,1);
   saveFile(`Resultados_${modInfo(key).nome.replace(/[^A-Za-zÀ-ú0-9]+/g,'_')}_${stamp()}.json`,data,'Resultados baixados')}
 function doBackup(){const data=JSON.stringify({tipo:'chaveamento-iv-campeonato',gerado:new Date().toISOString(),modalidades:S,telao:{modo:TV.modo,vista:TV.vista}},null,1);
   saveFile(`provas-entrega-labirinto-backup-${stamp()}.json`,data,'Backup baixado')}
@@ -21050,9 +21053,11 @@ function askImport(file){if(!file)return;const fr=new FileReader();fr.onload=()=
   if(!modInfo(o.modalidade)){toast('Este arquivo é de outra modalidade, não de '+MODS.map(m=>m.nome).join(' / '));return}
   pendingImport=o;const n=Object.keys((o.estado&&o.estado.prov)||{}).length;
   if(box)box.innerHTML=`<p class="notice bad" style="margin-top:10px">Substituir <b>${esc(modInfo(o.modalidade).nome)}</b> pelos dados de ${esc(new Date(o.gerado).toLocaleString('pt-BR'))} (${n} equipe(s) com súmula)? <button class="btn small danger" data-act="importOk">Substituir</button></p>`};fr.readAsText(file)}
+/* ao recuperar um .json exportado: volta o tempo digitado e tira os campos calculados (p) */
+function unExport(e){e=JSON.parse(JSON.stringify(e||{}));Object.values(e.prov||{}).forEach(P=>ARS.forEach(ar=>{const a=P&&P[ar];if(!a||!('p' in a))return;delete a.p;if('tdig' in a){if(a.tdig==null)delete a.t;else a.t=a.tdig;delete a.tdig}}));return e}
 function doImport(){const o=pendingImport;if(!o)return;pendingImport=null;
   if(o.backup){MODS.forEach(m=>{const b=o.backup.modalidades[m.key];if(b){undo[m.key].push([[[],JSON.parse(JSON.stringify(S[m.key]))]]);S[m.key]=normalize(m.key,b);save(m.key)}});toast('Backup restaurado');return}
-  const k=o.modalidade;undo[k].push([[[],JSON.parse(JSON.stringify(S[k]))]]);S[k]=normalize(k,o.estado);save(k);ui.mod=k;toast(modInfo(k).nome+': dados recuperados')}
+  const k=o.modalidade;undo[k].push([[[],JSON.parse(JSON.stringify(S[k]))]]);S[k]=normalize(k,unExport(o.estado));save(k);ui.mod=k;toast(modInfo(k).nome+': dados recuperados')}
 async function doWordRes(key){const st=S[key],tm=tmOf(st),mi=modInfo(key);const lab=key==='labirinto';
   toast('Gerando o Word…');let D;try{D=await loadDocx()}catch(e){toast('Não foi possível gerar o Word');return}
   const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,ShadingType,AlignmentType,HeadingLevel,BorderStyle,VerticalAlign,Footer,PageNumber}=D;
@@ -21328,7 +21333,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   case'pinOk':pinSubmit();return;
   case'dlgClose':try{$('#dlg').close()}catch(err){}return;
   case'zerar':{ui.confirm=null;const k=ui.mod;const base=window.SEED&&SEED[k]?JSON.parse(JSON.stringify(SEED[k])):{};
-    const bk=JSON.stringify({tipo:'chaveamento-iv-campeonato-modalidade',modalidade:k,nome:modInfo(k).nome,gerado:new Date().toISOString(),motivo:'backup automático antes de zerar',estado:S[k]},null,1);
+    const bk=JSON.stringify({tipo:'chaveamento-iv-campeonato-modalidade',modalidade:k,nome:modInfo(k).nome,gerado:new Date().toISOString(),motivo:'backup automático antes de zerar',estado:exportState(k)},null,1);
     saveFile(`Backup_antes_de_zerar_${modInfo(k).nome.replace(/[^A-Za-zÀ-ú0-9]+/g,'_')}_${stamp()}.json`,bk,'Backup salvo');try{$('#dlg').close()}catch(err){}
     mutate(k,s=>{const n=normalize(k,base);Object.keys(s).forEach(x=>delete s[x]);Object.assign(s,n)});ui.edit={f:null,d:null};TV.vista='auto';saveTV();toast('Backup .json baixado e dados zerados');return}
   case'callMany':openCallMany();return;
