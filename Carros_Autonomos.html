@@ -21557,7 +21557,7 @@ body:not(.tv) .medal{font-size:15px}
 @keyframes medalshine{0%,80%,100%{filter:none}88%{filter:brightness(1.25)}}
 </style>
 <script id="medalhas-js">
-/* Medalhas: as 3 primeiras colocações de cada tabela de classificação ganham ouro, prata e bronze.
+/* Medalhas: as 3 primeiras colocações com pontos (total maior que 0) ganham ouro, prata e bronze; sem pontos não há pódio.
    Funciona nos três sites (Entrega, Labirinto e Carros), no telão e na tela de classificação da coordenação. */
 (function(){
   const CLS=['classif','classifc'];
@@ -21567,7 +21567,9 @@ body:not(.tv) .medal{font-size:15px}
     tables.forEach(tb=>{tb.querySelectorAll('tbody tr').forEach(tr=>{
       const td=tr.querySelector('td');if(!td||tr.dataset.med)return;
       const n=parseInt((td.textContent||'').trim(),10);
-      if(n>=1&&n<=3&&/^\d+$/.test(td.textContent.trim())){tr.classList.add('med'+n);tr.dataset.med=n;td.innerHTML='<span class="medal m'+n+'" title="'+['','Ouro','Prata','Bronze'][n]+'">'+n+'</span>'}})})}
+      /* sem pontos não há pódio: a coluna Total é a 5ª nas tabelas de classificação dos três sites */
+      const tot=parseInt(((tr.children[4]||{}).textContent||'').trim(),10);
+      if(n>=1&&n<=3&&/^\d+$/.test(td.textContent.trim())&&tot>0){tr.classList.add('med'+n);tr.dataset.med=n;td.innerHTML='<span class="medal m'+n+'" title="'+['','Ouro','Prata','Bronze'][n]+'">'+n+'</span>'}})})}
   ['renderApp','renderTV'].forEach(fn=>{const orig=window[fn];if(typeof orig!=='function')return;window[fn]=function(){const r=orig.apply(this,arguments);try{decorate()}catch(e){}return r}});
   decorate();
 })();
