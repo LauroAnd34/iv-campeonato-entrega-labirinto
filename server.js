@@ -1,14 +1,14 @@
-/* Servidor de sincronização de uma prova (Desafio de Entrega ou Labirinto Inteligente).
+/* Servidor de sincronização de uma prova (Desafio de Entrega, Labirinto Inteligente ou Carros Autônomos).
    - Serve o site da prova em "/" (coordenação) e "/#telao" (TV).
    - Guarda o estado da prova e empurra cada mudança na hora para todos os aparelhos (Server-Sent Events).
    - Recebe só o que mudou (patches), para dois árbitros editarem ao mesmo tempo sem apagar um ao outro.
    - Edição protegida por PIN (variável de ambiente PIN); o telão só lê.
    Sem dependências: node server.js */
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
-const MOD = process.env.MODALIDADE === 'labirinto' ? 'labirinto' : 'entrega';
+const MOD = ['labirinto', 'carros'].includes(process.env.MODALIDADE) ? process.env.MODALIDADE : 'entrega';
 const PIN = String(process.env.PIN || '');
 const PORT = +process.env.PORT || 10000;
-const HTML = path.join(__dirname, MOD === 'labirinto' ? 'Labirinto_Inteligente.html' : 'Desafio_de_Entrega.html');
+const HTML = path.join(__dirname, { entrega: 'Desafio_de_Entrega.html', labirinto: 'Labirinto_Inteligente.html', carros: 'Carros_Autonomos.html' }[MOD]);
 const DATA = process.env.DATA_FILE || path.join(require('os').tmpdir(), 'estado-' + MOD + '.json');
 
 let state = null, tv = { modo: 'auto', vista: 'auto' }, rev = 0;
@@ -71,7 +71,7 @@ const server = http.createServer((req, res) => {
       if (e) return send(res, 400, { erro: 'JSON inválido' });
       if (url.pathname === '/api/tv') {
         const t = body.tv || {};
-        tv = { modo: String(t.modo || 'auto').slice(0, 20), vista: String(t.vista || 'auto').slice(0, 20) };
+        tv = { modo: String(t.modo || 'auto').slice(0, 20), vista: String(t.vista || 'auto').slice(0, 20), cv: String(t.cv || 'auto').slice(0, 20) };
         rev++; broadcast(); return send(res, 200, { rev });
       }
       const patch = body.patch;
