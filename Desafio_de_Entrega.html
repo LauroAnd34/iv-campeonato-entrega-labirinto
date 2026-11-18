@@ -20628,8 +20628,10 @@ function clk(ms,tenths){ms=Math.max(0,ms);const s=Math.floor(ms/1000),m=Math.flo
    Labirinto (4.4): conclusão vale 100 menos penalidades (toque −5, parede derrubada −15, largada sem movimento −10); não concluída = 0; 3ª largada sem movimento = 0.
    Entrega (5.3): obstáculo +40, descontinuidade +10, coleta +40, entrega +50, estacionar na FIM +20; reposicionar no início −10, na coleta −20, bloco entregue afetado −50; mínimo 0. */
 const FIELDS=['l','w','m','o','dc','c','e','rp','rz','bx'];
-function touched(a){return!!a&&(a.feito||a.fim||!!a.t||FIELDS.some(k=>I(a[k])>0))}
-function arScore(key,a,ar){if(!touched(a))return null;const mx=modInfo(key).max[ar];const tr=pSec(a.t);const m=I(a.m);const zero=m>=3;const concl=!!a.fim&&!zero;let pts,pen=0,ent=0;
+function touched(a){return!!a&&(a.nf||a.feito||a.fim||!!a.t||FIELDS.some(k=>I(a[k])>0))}
+function arScore(key,a,ar){if(!touched(a))return null;const mx=modInfo(key).max[ar];
+  /* equipe presente que não quis fazer a prova nesta arena: 0 ponto e tempo máximo no desempate */
+  if(a.nf)return{pts:0,concl:false,zero:false,t:mx,traw:null,pen:0,ent:0,feito:true,nf:true,semTempo:false};const tr=pSec(a.t);const m=I(a.m);const zero=m>=3;const concl=!!a.fim&&!zero;let pts,pen=0,ent=0;
   if(key==='labirinto'){const l=I(a.l),w=I(a.w);pen=l+w+m;pts=concl?Math.max(0,100-5*l-15*w-10*m):0}
   else{ent=zero?0:I(a.e);pts=Math.max(0,40*I(a.o)+10*I(a.dc)+40*I(a.c)+50*I(a.e)+(concl?20:0)-10*I(a.rp)-20*I(a.rz)-50*I(a.bx))}
   if(zero)pts=0;
@@ -20870,14 +20872,15 @@ function vArena(st,tm,ar){const mi=modInfo(st.key),key=st.key;const R=st.rel[ar]
      <div class="row" style="margin-top:12px;align-items:flex-end"><label class="f" style="font-size:15px">Tempo (m:ss)<input type="text" id="tt-${ar}-${eid}" data-f="pv" data-id="${eid}" data-ar="${ar}" data-k="t" value="${esc(a.t||'')}" placeholder="m:ss" inputmode="decimal" style="width:6em;font-size:20px;font-family:var(--f-mono)"></label>
       ${eid===aid?`<button class="btn" data-act="tRec" data-ar="${ar}">Usar o tempo do relógio</button>`:''}
       <label class="f grow" style="font-size:15px">Observação<input type="text" id="to-${ar}-${eid}" data-f="pv" data-id="${eid}" data-ar="${ar}" data-k="obs" value="${esc(a.obs||'')}" style="width:100%;font-size:16px"></label></div>
-     <div class="row" style="margin-top:14px">${a.feito?`<span class="chip ok" style="font-size:15px">prova encerrada</span><button class="btn" data-act="feito" data-ar="${ar}" data-id="${eid}" data-v="0">Reabrir</button>`:`<button class="btn primary bigb" data-act="feito" data-ar="${ar}" data-id="${eid}" data-v="1">Encerrar prova e lançar resultado</button>`}
-      <span class="hint" style="margin:0">Cada toque já atualiza o placar no telão.</span></div></div>`}
+     <div class="row" style="margin-top:14px">${a.feito?`<span class="chip ${a.nf?'warn':'ok'}" style="font-size:15px">${a.nf?'não quis fazer a prova':'prova encerrada'}</span><button class="btn" data-act="feito" data-ar="${ar}" data-id="${eid}" data-v="0">Reabrir</button>`:`<button class="btn primary bigb" data-act="feito" data-ar="${ar}" data-id="${eid}" data-v="1">Encerrar prova e lançar resultado</button>
+      ${ui.confirm==='nf:'+ar+':'+eid?`<button class="btn danger bigb" data-act="nf" data-ar="${ar}" data-id="${eid}">Confirmar: ${esc(tname(tm,eid))} não quis fazer</button><button class="btn" data-act="cancel">Voltar</button>`:`<button class="btn bigb" data-act="ask" data-k="nf:${ar}:${eid}">Não quis fazer a prova</button>`}`}
+      <span class="hint" style="margin:0">Cada toque já atualiza o placar no telão. “Não quis fazer” lança 0 ponto e o tempo máximo da arena para o desempate.</span></div></div>`}
   /* Tabela na ordem do chaveamento (a mesma da chamada e das chaves do telão) */
   const tbl=`<div class="panel"><h2>Todas as equipes · ordem de passagem</h2><div class="tablewrap" style="margin-top:8px"><table class="big"><thead><tr><th class="n">Ordem</th><th>Equipe</th><th>Situação</th><th class="n">Pontos</th><th class="n">Tempo</th><th></th></tr></thead><tbody>
    ${st.equipes.map(t=>{const out=t.aus||t.desc||(st.insp[t.id]||{}).st==='falta';const a=(st.prov[t.id]||{})[ar];const x=out?null:arScore(key,a,ar);
-     const sit=t.aus?'<span class="chip warn">não compareceu</span>':t.desc?'<span class="chip bad">desclassificada</span>':(st.insp[t.id]||{}).st==='falta'?'<span class="chip bad">não apresentou o robô</span>':a&&a.feito?'<span class="chip ok">encerrada</span>':aid===t.id?'<span class="chip acc">em arena</span>':ar==='d'&&!isDone(st,t.id,'f')?'<span class="chip">aguarda a fácil</span>':x?'<span class="chip warn">em aberto</span>':'<span class="chip">na fila</span>';
+     const sit=t.aus?'<span class="chip warn">não compareceu</span>':t.desc?'<span class="chip bad">desclassificada</span>':(st.insp[t.id]||{}).st==='falta'?'<span class="chip bad">não apresentou o robô</span>':a&&a.nf?'<span class="chip warn">não quis fazer</span>':a&&a.feito?'<span class="chip ok">encerrada</span>':aid===t.id?'<span class="chip acc">em arena</span>':ar==='d'&&!isDone(st,t.id,'f')?'<span class="chip">aguarda a fácil</span>':x?'<span class="chip warn">em aberto</span>':'<span class="chip">na fila</span>';
      return`<tr class="${out?'out':''} ${aid===t.id?'now':''} ${eid===t.id&&eid!==aid?'now':''}"><td class="n">${pad2(ordNum(st,t.id))}</td><td><b>${esc(t.nome)}</b> <span class="campus">${esc(t.campus)}</span></td><td>${sit}</td>
-       <td class="n"><b>${x?x.pts:'—'}</b></td><td class="n">${x?(x.zero?'zero':x.concl?fmtT(x.traw):'—'):''}</td><td>${out?'':`<button class="btn small" data-act="editArena" data-ar="${ar}" data-id="${t.id}">${eid===t.id?'Aberta':'Abrir súmula'}</button>`}</td></tr>`}).join('')}</tbody></table></div></div>`;
+       <td class="n"><b>${x?x.pts:'—'}</b></td><td class="n">${x?(x.nf?'não fez':x.zero?'zero':x.concl?fmtT(x.traw):'—'):''}</td><td>${out?'':`<button class="btn small" data-act="editArena" data-ar="${ar}" data-id="${t.id}">${eid===t.id?'Aberta':'Abrir súmula'}</button>`}</td></tr>`}).join('')}</tbody></table></div></div>`;
   return`<div class="section">${clock}${sumula}${tbl}</div>`}
 
 /* ===== Regras da prova (Manual do Competidor, nov/2026), em tabelas que abrem e fecham ===== */
@@ -20905,7 +20908,7 @@ function openRules(){const d=$('#dlg');d.innerHTML=rulesHTML(ui.mod);d.className
 
 /* ----- Classificação ----- */
 function vClassif(st,tm){const rows=rankOf(st,tm);const lab=st.key==='labirinto';const mi=modInfo(st.key);
-  const cell=x=>x?`${x.pts}<br><span class="campus">${x.zero?'zero':x.concl?fmtT(x.traw):'não concl.'}</span>`:'—';
+  const cell=x=>x?`${x.pts}<br><span class="campus">${x.nf?'não fez':x.zero?'zero':x.concl?fmtT(x.traw):'não concl.'}</span>`:'—';
   return`<div class="section"><div class="panel"><h2>Classificação · ${esc(mi.nome)}</h2><p class="hint">${lab?'4.5: soma das duas arenas (até 200). Desempate: menor soma dos tempos (arena não concluída conta 3:00 ou 4:00); menos penalidades; sorteio.':'5.4: soma das duas arenas. Desempate: menor soma dos tempos (arena não concluída conta 6:00 ou 8:00); mais blocos entregues corretamente; sorteio.'} Empate que persistir: faça o sorteio na mesa e ordene com as setas; a ordem fica registrada.</p></div>
    <div class="panel"><div class="tablewrap"><table><thead><tr><th class="n">#</th><th>Equipe</th><th class="n">Fácil</th><th class="n">Difícil</th><th class="n">Total</th><th class="n">Soma dos tempos</th><th class="n">${lab?'Penalidades':'Blocos entregues'}</th><th></th></tr></thead><tbody>
    ${rows.map(r=>{const bi=r.block.indexOf(r.id);return`<tr class="${r.pos&&r.pos<=3?'ok':''} ${!r.any?'out':''}"><td class="n">${r.pos||'—'}</td><td><b>${esc(tname(tm,r.id))}</b> <span class="campus">${esc(tcamp(tm,r.id))}</span>${r.falta?' <span class="chip bad">não apresentou na inspeção</span>':''}${r.tied?(r.resolved?' <span class="chip">desempate manual</span>':' <span class="chip warn">empate</span>'):''}</td>
@@ -20973,7 +20976,7 @@ async function doWordRes(key){const st=S[key],tm=tmOf(st),mi=modInfo(key);const 
   ARS.forEach(ar=>{kids.push(H(AR[ar]+' · tempo máximo '+fmtT(mi.max[ar]),{br:true}));
     const det=a=>lab?`toques ${I(a.l)}, paredes ${I(a.w)}, largadas s/ mov. ${I(a.m)}`:`obst. ${I(a.o)}, desc. ${I(a.dc)}, colet. ${I(a.c)}, entreg. ${I(a.e)}, rep. pista ${I(a.rp)}, rep. coleta ${I(a.rz)}, blocos afet. ${I(a.bx)}, larg. s/ mov. ${I(a.m)}`;
     kids.push(table([500,2500,4400,900,1338],['Ord.','Equipe','Ocorrências','Pontos','Tempo'],st.equipes.filter(t=>!t.aus).map(t=>{const a=(st.prov[t.id]||{})[ar];const x=arScore(key,a,ar);
-      return[ordNum(st,t.id),{t:t.nome,bold:true},x?det(a)+(a.obs?' · '+a.obs:''):'—',{t:x?x.pts:'—',bold:true},x?(x.zero?'zero':x.concl?fmtT(x.traw):'não concluída'):'']}),[1,0,0,1,1]))});
+      return[ordNum(st,t.id),{t:t.nome,bold:true},x?(a.nf?'não quis fazer a prova':det(a))+(a.obs?' · '+a.obs:''):'—',{t:x?x.pts:'—',bold:true},x?(x.zero?'zero':x.concl?fmtT(x.traw):'não concluída'):'']}),[1,0,0,1,1]))});
   kids.push(H('Ordem de passagem',{br:true}));kids.push(P(st.sorteio?sortAta(st,tm,st.sorteio).replace(/<[^>]+>/g,''):'Ordem do edital (Manual do Competidor, seção 9).',{color:MUT}));
   kids.push(table([900,3600,3200,1938],['Ordem','Equipe','Campus','Situação'],st.equipes.map((t,i)=>[pad2(i+1),{t:t.nome,bold:true},t.campus,t.aus?'ausente':t.desc?'desclassificada':(st.insp[t.id]||{}).st==='falta'?'não apresentou':'']),[1,0,0,0]));
   const doc=new Document({creator:'PIRPTA-IFMA',title:'Resultados – '+mi.nome,styles:{default:{document:{run:{font:F,size:19}}}},
@@ -21065,11 +21068,11 @@ function tvArenas(st,tm){const mi=modInfo(st.key);const pan=ARS.map(ar=>{const i
     const a=(st.prov[id]||{})[ar]||{};const x=arScore(st.key,a,ar);
     return`<section class="arp"><div class="arh">${AR[ar]}<span>máx. ${fmtT(mi.max[ar])}</span></div><div class="arn">${pad2(ordNum(st,id))} · ${esc(tname(tm,id))}</div><div class="arc">${esc(tcamp(tm,id))}</div>
       <div class="clk" data-clk="${st.key}:${ar}"></div><div class="bar"><i data-bar="${st.key}:${ar}"></i></div><div class="stt tvst" data-st="${st.key}:${ar}"></div>
-      <div class="pts"><span>${a.feito?'Resultado':'Parcial'}${x&&x.zero?' · zero (3 largadas sem movimento)':''}</span><b>${x?x.pts:0} pts</b></div></section>`}).join('');
+      <div class="pts"><span>${a.nf?'Não quis fazer a prova':a.feito?'Resultado':'Parcial'}${x&&x.zero?' · zero (3 largadas sem movimento)':''}</span><b>${x?x.pts:0} pts</b></div></section>`}).join('');
   const fF=filaArena(st,'f'),fD=filaArena(st,'d');
   return`<div class="tvar">${pan}</div><div class="tvnext"><span>A seguir na fácil: <b>${fF.slice(0,3).map(id=>pad2(ordNum(st,id))+' '+esc(tname(tm,id))).join(' · ')||'—'}</b></span><span>Na difícil: <b>${fD.slice(0,2).map(id=>pad2(ordNum(st,id))+' '+esc(tname(tm,id))).join(' · ')||'—'}</b></span></div>`}
 function tvClassif(st,tm){const rows=rankOf(st,tm);const any=rows.some(r=>r.any);const H=window.innerHeight||900,W=window.innerWidth||1600;const cols=rows.length>14&&W/H>=1.15?2:1;const per=Math.ceil(rows.length/cols)||1;
-  const fs=Math.max(11,Math.min(48,(H*0.7)/(per+1)/2.75));const sc=x=>x?`${x.pts}<span class="tvtime">${x.zero?'zero':x.concl?fmtT(x.traw):'não concl.'}</span>`:'—';
+  const fs=Math.max(11,Math.min(48,(H*0.7)/(per+1)/2.75));const sc=x=>x?`${x.pts}<span class="tvtime">${x.nf?'não fez':x.zero?'zero':x.concl?fmtT(x.traw):'não concl.'}</span>`:'—';
   const tbl=part=>`<div class="tvcar"><table><thead><tr><th class="n">#</th><th>Equipe</th><th class="n">Fácil</th><th class="n">Difícil</th><th class="n">Total</th></tr></thead><tbody>${part.map(r=>`<tr class="${any&&r.pos&&r.pos<=3?'q':''}"><td class="n">${r.pos||'–'}</td><td><span class="nm2">${esc(tname(tm,r.id))}</span><span class="cp">${esc(tcamp(tm,r.id))}</span></td><td class="n">${sc(r.f)}</td><td class="n">${sc(r.d)}</td><td class="n"><b>${r.any?r.tot:'—'}</b></td></tr>`).join('')}</tbody></table></div>`;
   const parts=[];for(let i=0;i<cols;i++)parts.push(tbl(rows.slice(i*per,(i+1)*per)));
   const fora=st.equipes.filter(t=>t.aus||(st.insp[t.id]||{}).st==='falta');
@@ -21123,7 +21126,7 @@ function doCall(s,a,id){const now=NOW();let n;
 function doCallAll(s){const now=NOW();s.cham={seq:((s.cham&&s.cham.seq)||0)+1,at:now,a:'all',id:null,n:1}}
 const FMAX={m:3};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,st=S[ui.mod],tm=tmOf(st);
-  if(a!=='ask'&&a!=='cancel'&&!['sortear','delTeam','tReset','zerar'].includes(a))ui.confirm=null;
+  if(a!=='ask'&&a!=='cancel'&&!['sortear','delTeam','tReset','zerar','nf'].includes(a))ui.confirm=null;
   switch(a){
   case'mod':ui.mod=b.dataset.k;ui.edit={f:null,d:null};store('ui',{mod:ui.mod,step:ui.step});break;
   case'step':ui.step=b.dataset.k;store('ui',{mod:ui.mod,step:ui.step});window.scrollTo(0,0);break;
@@ -21158,8 +21161,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   case'xStop':mutate(ui.mod,s=>stopX(s,b.dataset.ar),true);return;
   case'cnt':{const{ar,id,k}=b.dataset;const d=+b.dataset.d;mutate(ui.mod,s=>{const p=prov(s,id,ar);let v=I(p[k])+d;if(v<0)v=0;if(FMAX[k]!=null)v=Math.min(v,FMAX[k]);if(s.key==='entrega'){const C=s.cfg.arena[ar];const lim={o:C.obs,dc:C.desc,c:C.blocos,e:C.blocos}[k];if(lim!=null)v=Math.min(v,lim)}p[k]=v});return}
   case'tg':{const{ar,id,k}=b.dataset;mutate(ui.mod,s=>{const p=prov(s,id,ar);p[k]=!p[k]});return}
-  case'feito':{const{ar,id}=b.dataset;const v=b.dataset.v==='1';mutate(ui.mod,s=>{const p=prov(s,id,ar);if(v&&s.rel[ar]&&s.rel[ar].id===id){pauseP(s,ar);stopX(s,ar);if(p.fim&&!p.t){p.t=fmtT(Math.floor(relInfo(s,ar).e/100)/10)}}p.feito=v});
+  case'feito':{const{ar,id}=b.dataset;const v=b.dataset.v==='1';mutate(ui.mod,s=>{const p=prov(s,id,ar);if(v&&s.rel[ar]&&s.rel[ar].id===id){pauseP(s,ar);stopX(s,ar);if(p.fim&&!p.t){p.t=fmtT(Math.floor(relInfo(s,ar).e/100)/10)}}p.feito=v;if(!v)p.nf=false});
     if(v){ui.edit[ar]=null;toast('Resultado lançado: '+tname(tm,id))}return}
+  case'nf':{const{ar,id}=b.dataset;ui.confirm=null;mutate(ui.mod,s=>{const p=prov(s,id,ar);if(s.rel[ar]&&s.rel[ar].id===id){pauseP(s,ar);stopX(s,ar)}p.nf=true;p.feito=true;p.fim=false});ui.edit[ar]=null;toast(tname(tm,id)+': não quis fazer a prova nesta arena');return}
   case'editArena':ui.edit[b.dataset.ar]=b.dataset.id||null;window.scrollTo({top:0,behavior:'smooth'});break;
   case'tie':{const id=b.dataset.id,d=+b.dataset.d;const row=rankOf(st,tm).find(r=>r.id===id);if(!row)return;const bl=row.block.slice();const i=bl.indexOf(id),j=i+d;if(j<0||j>=bl.length)return;[bl[i],bl[j]]=[bl[j],bl[i]];
     mutate(ui.mod,s=>{const cur=(s.manual.RANK||[]).filter(x=>!bl.includes(x));s.manual.RANK=cur.concat(bl)});return}
