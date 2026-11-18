@@ -20932,7 +20932,7 @@ function vProva(st,tm,P){const urb=P==='u';const L=st.equipes.slice().sort((a,b)
   return`<div class="section"><div class="panel"><h2>${urb?'Prova de condução urbana':'Prova de corrida'}</h2>
    <p class="hint">${urb?'9.5: 25 pontos por checkpoint na ordem, na faixa e no sentido corretos, menos as infrações (parada de 3 s não cumprida −15, direção contrária −25, troca de faixa proibida ou sentido incorreto −20), entre 0 e 100. Conclusão = 4 checkpoints, com a parada final.':'9.4: 25 pontos por checkpoint na ordem, até 100. Conclusão = 4 checkpoints.'} Três tentativas de até 5 min; vale a de maior pontuação e, em empate da própria equipe, a de menor tempo. Tentativa não concluída conta 5:00. Tempo no formato m:ss (ex.: 2:37). Ordem alfabética.</p></div>
    <div class="panel"><div class="tablewrap"><table><thead><tr><th class="n">Ordem</th><th>Equipe</th><th>Tentativa 1</th><th>Tentativa 2</th><th>Tentativa 3</th><th>Melhor</th></tr></thead><tbody>
-   ${L.map(t=>{if(t.aus)return`<tr class="out"><td class="n">—</td><td><b>${esc(t.nome)}</b><br><span class="campus">${esc(t.campus)}</span></td><td colspan="4"><span class="chip warn">ausente</span></td></tr>`;
+   ${L.map(t=>{const fz=!!(((st.faltou||{})[P]||{})[t.id]);if(t.aus||fz)return`<tr class="out"><td class="n">—</td><td><b>${esc(t.nome)}</b><br><span class="campus">${esc(t.campus)}</span></td><td colspan="4"><span class="chip warn">${t.aus?'ausente':'faltou nesta prova'}</span></td></tr>`;
      const b=bestAtt((st.prov[t.id]||{})[P],urb);return`<tr><td class="n">${++ord}</td><td><b>${esc(t.nome)}</b><br><span class="campus">${esc(t.campus)}</span></td>${[0,1,2].map(i=>cell(t,i)).join('')}<td class="best">${b?`${b.pts} pts<br><span class="campus">${b.concl?fmtT(b.t):'5:00'} · T${b.idx+1}</span>`:'—'}</td></tr>`}).join('')}
    </tbody></table></div></div></div>`}
 function vClassCarros(st,tm){const rows=carrosRank(st,tm);
@@ -21294,7 +21294,7 @@ function faltou(st,P,id){return!!(((st.faltou||{})[P]||{})[id])}
 function present(st,P){return st.equipes.filter(t=>!t.aus&&!t.desc&&!(P&&faltou(st,P,t.id))).slice().sort((a,b)=>a.nome.localeCompare(b.nome,'pt'))}
 function ensureFaltou(s){if(!s.faltou){s.faltou={c:{},u:{}};s.equipes.forEach(t=>{if(t.aus){s.faltou.c[t.id]=1;s.faltou.u[t.id]=1}})}s.faltou.c=s.faltou.c||{};s.faltou.u=s.faltou.u||{};return s.faltou}
 /* mesma numeração da tabela de tentativas do site original (só equipes presentes, em ordem alfabética) */
-function ordemN(st,id){return present(st).findIndex(t=>t.id===id)+1}
+function ordemN(st,id,P){return present(st,P).findIndex(t=>t.id===id)+1}
 const filled=a=>a&&(a.cp!=null||a.z);
 function nDone(st,id,P){return((st.prov[id]||{})[P]||[]).filter(filled).length}
 function slotFree(st,id,P){const L=(st.prov[id]||{})[P]||[];for(let i=0;i<3;i++)if(!filled(L[i]))return i;return -1}
@@ -21321,7 +21321,7 @@ window.vAoVivo=function(st,tm){const L=st.live;const ativo=L&&!L.fim;
     <p class="hint">9.3: três tentativas de até 5 min por equipe em cada prova, em rodadas (todas fazem a 1ª, depois a 2ª e a 3ª), na ordem alfabética. Entre tentativas da mesma equipe há até 10 min de ajustes (use “Treino e ajustes”). O tempo de 5 min inclui posicionamento, inicialização, percurso e recuperação autorizada.</p>
     <div class="row" style="margin-top:12px;align-items:flex-end;gap:14px">
      <div><div class="f" style="font-size:13px;color:var(--muted);margin-bottom:4px">Prova</div><div class="mods">${['c','u'].map(p=>`<button class="mod-tab" data-act="cxP" data-k="${p}" aria-pressed="${P===p}">${PN[p]}</button>`).join('')}</div></div>
-     <label class="f">Equipe<select id="cx-eq" data-f="cxEq" style="font-size:16px;min-width:15em">${L2.map(t=>`<option value="${t.id}" ${t.id===id?'selected':''}>${String(ordemN(st,t.id)).padStart(2,'0')} · ${esc2(t.nome)} (${nDone(st,t.id,P)}/3)${t.id===R.next?' · próxima':''}</option>`).join('')}</select></label>
+     <label class="f">Equipe<select id="cx-eq" data-f="cxEq" style="font-size:16px;min-width:15em">${L2.map(t=>`<option value="${t.id}" ${t.id===id?'selected':''}>${String(ordemN(st,t.id,P)).padStart(2,'0')} · ${esc2(t.nome)} (${nDone(st,t.id,P)}/3)${t.id===R.next?' · próxima':''}</option>`).join('')}</select></label>
      <label class="f">Tentativa<select id="cx-i" data-f="cxI" style="font-size:16px">${[0,1,2].map(k=>{const a=id&&((st.prov[id]||{})[P]||[])[k];return`<option value="${k}" ${k===i?'selected':''} ${filled(a)?'disabled':''}>${k+1}ª${filled(a)?' (já lançada)':''}</option>`}).join('')}</select></label>
      <button class="btn primary bigb" data-act="cxPrep" ${!id||i<0?'disabled':''}>Preparar e mostrar no telão</button>
      ${ui.confirm==='cxNF'?`<button class="btn danger bigb" data-act="cxNF" data-id="${id}" data-i="${i}">Confirmar: ${esc2(tname(tm,id))} não quis fazer a ${i+1}ª tentativa</button><button class="btn" data-act="cancel">Voltar</button>`:`<button class="btn bigb" data-act="ask" data-k="cxNF" ${!id||i<0?'disabled':''}>Não quis fazer a tentativa</button>`}</div>
@@ -21336,7 +21336,7 @@ function presPanel(st,tm,P){const L=st.equipes.filter(t=>!t.desc).slice().sort((
    </tbody></table></div></div>`}
 function vLive(st,tm,L){const e=elL(L);const cp=(L.cps||[]).length;const over=e>=LIM;
   const inf=L.P==='u'?`<div class="scgrid" style="margin-top:12px">${INF.map(([k,l,p])=>`<div class="crit sc"><span class="lbl"><b>${l}</b><span class="pt neg">−${p} por ocorrência</span></span><button class="btn" data-act="cxInf" data-k="${k}" data-d="-1" ${((L.inf||{})[k]||0)<=0?'disabled':''} aria-label="Menos: ${l}">−</button><span class="v">${(L.inf||{})[k]||0}</span><button class="btn" data-act="cxInf" data-k="${k}" data-d="1" aria-label="Mais: ${l}">+</button></div>`).join('')}</div>`:'';
-  return`<div class="section"><div class="panel cxlivep"><div class="row"><div class="grow"><h2 style="font-size:26px">${String(ordemN(st,L.id)).padStart(2,'0')} · ${esc2(tname(tm,L.id))}</h2><span class="campus" style="font-size:15px">${esc2(tm[L.id]&&tm[L.id].campus)} · ${PN[L.P]} · tentativa ${L.i+1} de 3</span></div>
+  return`<div class="section"><div class="panel cxlivep"><div class="row"><div class="grow"><h2 style="font-size:26px">${String(ordemN(st,L.id,L.P)).padStart(2,'0')} · ${esc2(tname(tm,L.id))}</h2><span class="campus" style="font-size:15px">${esc2(tm[L.id]&&tm[L.id].campus)} · ${PN[L.P]} · tentativa ${L.i+1} de 3</span></div>
       <div style="text-align:right"><div class="cxbigpts">${ptsL(L)}<small> pts</small></div><span class="stt" data-cx-st></span></div></div>
     <div class="row" style="margin-top:12px;align-items:center;gap:16px"><span class="cxclk" data-cx-clk>0:00,0</span><span class="hint" style="margin:0">limite 5:00 · <span data-cx-rest></span></span></div>
     <div class="bar" style="margin-top:8px"><i data-cx-bar></i></div>
@@ -21346,8 +21346,8 @@ function vLive(st,tm,L){const e=elL(L);const cp=(L.cps||[]).length;const over=e>
     <div class="cxcps">${[0,1,2,3].map(k=>`<div class="cxcpi ${k<cp?'on':''}"><b>${k===3?'Chegada':'Checkpoint '+(k+1)}</b><span>${k<cp?fmt(L.cps[k],true):'—'}</span></div>`).join('')}</div>
     ${inf}
     <div class="crit sc" style="margin-top:8px"><span class="lbl"><b>Tocou no carro sem pedir parada (9.6)</b><span class="pt neg">zero ponto nesta tentativa</span></span><button class="btn tgb ${L.z?'danger':''}" data-act="cxZero" aria-pressed="${!!L.z}">${L.z?'Sim · zero':'Não'}</button></div>
-    <h3 style="margin-top:16px">Encerrar a tentativa (9.6) e lançar na súmula</h3>
-    <div class="row" style="margin-top:8px;gap:8px">${MOTIVOS.filter(([k])=>k!=='naofez'||(e===0&&!cp)).map(([k,l])=>`<button class="btn ${k==='concluiu'?'primary':''} bigb" data-act="cxEnd" data-k="${k}" ${k==='concluiu'&&(cp<4||L.z)?'disabled':''}>${l}</button>`).join('')}</div>
+    <h3 style="margin-top:16px">💾 Salvar a tentativa na súmula: como ela terminou?</h3><p class="hint" style="margin:4px 0 0">O relógio para e a tentativa vai para a súmula da ${PN[L.P].toLowerCase()} com o tempo do cronômetro. Em “Concluiu”, os checkpoints que não foram marcados são completados no tempo da chegada.</p>
+    <div class="row" style="margin-top:8px;gap:8px">${MOTIVOS.filter(([k])=>k!=='naofez'||(e===0&&!cp)).map(([k,l])=>`<button class="btn ${k==='concluiu'?'primary':''} bigb" data-act="cxEnd" data-k="${k}" ${k==='concluiu'&&L.z?'disabled':''}>${l}</button>`).join('')}</div>
     <div class="row" style="margin-top:10px">${ui.confirm==='cxCancel'?`<button class="btn danger" data-act="cxCancel">Confirmar: descartar sem lançar</button><button class="btn" data-act="cancel">Voltar</button>`:`<button class="btn small" data-act="ask" data-k="cxCancel">Descartar esta tentativa (não lança nada)</button>`}
       <span class="hint" style="margin:0">Checkpoints e infrações válidos ficam preservados ao encerrar (9.6). Tudo aparece no telão na hora.</span></div></div></div>`}
 
@@ -21389,7 +21389,7 @@ function tvLive(st,tm,L){const cp=(L.cps||[]).length;const justCp=L.cpAt&&now()-
   const inf=L.P==='u'?`<div class="cxinfs ${justInf?'shake':''}">${INF.map(([k,l,p])=>`<div class="cxinf ${(L.inf||{})[k]?'on':''}"><b>−${p}</b><span>${l}</span><i>${(L.inf||{})[k]||0}×</i></div>`).join('')}</div>`:'';
   const placas=L.P==='u'?`<div class="cxplacas">${PLACAS.map(([id,n,k])=>`<div class="cxpl">${placaSVG(k)}<span>${n}</span></div>`).join('')}</div>`:'';
   return`<div class="cxlive ${L.P==='u'?'urb':''}">
-   <div class="cxtop"><div class="cxteam"><span class="cxn">${String(ordemN(st,L.id)).padStart(2,'0')}</span><div style="min-width:0"><div class="cxname">${esc2(tname(tm,L.id))}</div><div class="cxsub">${esc2(tm[L.id]&&tm[L.id].campus)} · ${PN[L.P]} · tentativa ${L.i+1} de 3</div></div></div>
+   <div class="cxtop"><div class="cxteam"><span class="cxn">${String(ordemN(st,L.id,L.P)).padStart(2,'0')}</span><div style="min-width:0"><div class="cxname">${esc2(tname(tm,L.id))}</div><div class="cxsub">${esc2(tm[L.id]&&tm[L.id].campus)} · ${PN[L.P]} · tentativa ${L.i+1} de 3</div></div></div>
      <div class="cxpts"><b class="${justCp||justInf?'bump':''}">${L.z?0:ptsL(L)}</b><span>pontos${best?` · melhor até aqui: ${best.pts}`:''}</span></div></div>
    <div class="cxclockrow"><div class="cxclock" data-cx-clk>0:00,0</div><div class="cxside"><div class="stt tvst" data-cx-st></div><div class="cxrest">restam <b data-cx-rest>5:00</b></div></div></div>
    <div class="cxbar"><i data-cx-bar></i></div>
@@ -21445,7 +21445,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   case'cxCpUndo':mutate(K,s=>{s.live.cps=(s.live.cps||[]).slice(0,-1)});break;
   case'cxInf':{const k=b.dataset.k,d=+b.dataset.d;mutate(K,s=>{const f=s.live.inf=s.live.inf||{};f[k]=Math.max(0,(f[k]||0)+d);if(d>0)s.live.infAt=now()});break}
   case'cxZero':mutate(K,s=>{s.live.z=!s.live.z});break;
-  case'cxEnd':{const motivo=b.dataset.k;mutate(K,s=>{const l=s.live;if(l.t0){l.acc=Math.min(LIM,(l.acc||0)+now()-l.t0);l.t0=null}const cp=(l.cps||[]).length;const t=fmt(l.acc||0,true);
+  case'cxEnd':{const motivo=b.dataset.k;mutate(K,s=>{const l=s.live;if(l.t0){l.acc=Math.min(LIM,(l.acc||0)+now()-l.t0);l.t0=null}if(motivo==='concluiu'&&!l.z){l.cps=(l.cps||[]).slice();while(l.cps.length<4)l.cps.push(l.acc||0)}const cp=(l.cps||[]).length;const t=fmt(l.acc||0,true);
       const att=motivo==='naofez'?{cp:0,nf:true}:{cp,t};if(l.z&&motivo!=='naofez')att.z=true;if(l.P==='u'){att.p15=l.inf.p15||0;att.p25=l.inf.p25||0;att.p20=l.inf.p20||0}
       /* a súmula considera concluída a tentativa com os 4 checkpoints; não concluída conta 5:00 na classificação (9.4/9.5) */
       slot(s,l.id,l.P)[l.i]=att;l.fim={pts:l.z?0:ptsL(l),cp,t,motivo,at:now()}});toast('Tentativa lançada na súmula');break}
