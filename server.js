@@ -14,9 +14,43 @@ const DATA = process.env.DATA_FILE || path.join(require('os').tmpdir(), 'estado-
 let state = null, tv = { modo: 'auto', vista: 'auto' }, rev = 0;
 try { const j = JSON.parse(fs.readFileSync(DATA, 'utf8')); state = j.state || null; tv = j.tv || tv; rev = j.rev || 0; } catch (e) {}
 
+/* Cópia no banco Key Value do Render (REDIS_URL): o servidor gratuito dorme e reinicia vazio; ao acordar, lê de lá.
+   Cliente mínimo do protocolo Redis (só GET e SET), sem dependências. */
+const net = require('net');
+const KEY = 'estado-' + MOD;
+function kv(cmd) {
+  return new Promise((resolve, reject) => {
+    const u = process.env.REDIS_URL; if (!u) return resolve(null);
+    let url; try { url = new URL(u); } catch (e) { return reject(e); }
+    const args = [];
+    if (url.password) args.push(['AUTH', ...(url.username && url.username !== 'default' ? [decodeURIComponent(url.username)] : []), decodeURIComponent(url.password)]);
+    args.push(cmd);
+    const enc = a => '*' + a.length + '\r\n' + a.map(x => { const b = Buffer.from(String(x), 'utf8'); return '$' + b.length + '\r\n' + b.toString('utf8') + '\r\n'; }).join('');
+    const sock = (url.protocol === 'rediss:' ? require('tls') : net).connect({ host: url.hostname, port: +url.port || 6379, servername: url.hostname });
+    let buf = Buffer.alloc(0), replies = [];
+    const done = (e, v) => { try { sock.destroy(); } catch (x) {} e ? reject(e) : resolve(v); };
+    sock.setTimeout(8000, () => done(new Error('timeout')));
+    sock.on('error', e => done(e));
+    sock.on('connect', () => sock.write(args.map(enc).join('')));
+    sock.on('secureConnect', () => {});
+    sock.on('data', d => {
+      buf = Buffer.concat([buf, d]);
+      while (buf.length) {
+        const nl = buf.indexOf('\r\n'); if (nl < 0) return;
+        const t = String.fromCharCode(buf[0]), line = buf.slice(1, nl).toString('utf8');
+        if (t === '$') { const n = +line; if (n < 0) { replies.push(null); buf = buf.slice(nl + 2); } else { if (buf.length < nl + 2 + n + 2) return; replies.push(buf.slice(nl + 2, nl + 2 + n).toString('utf8')); buf = buf.slice(nl + 2 + n + 2); } }
+        else { if (t === '-') return done(new Error(line)); replies.push(line); buf = buf.slice(nl + 2); }
+        if (replies.length === args.length) return done(null, replies[replies.length - 1]);
+      }
+    });
+  });
+}
+let kvOk = false, kvT = null;
+function kvSave() { if (!process.env.REDIS_URL) return; clearTimeout(kvT); kvT = setTimeout(() => kv(['SET', KEY, JSON.stringify({ state, tv, rev })]).then(() => { kvOk = true; }).catch(e => { kvOk = false; console.error('kv set', e.message); }), 300); }
+
 const clients = new Set();
 let saveT = null;
-function persist() { clearTimeout(saveT); saveT = setTimeout(() => fs.writeFile(DATA, JSON.stringify({ state, tv, rev }), () => {}), 400); }
+function persist() { clearTimeout(saveT); saveT = setTimeout(() => fs.writeFile(DATA, JSON.stringify({ state, tv, rev }), () => {}), 400); kvSave(); }
 function packet() { return `data: ${JSON.stringify({ st: state, tv, rev, now: Date.now() })}\n\n`; }
 function broadcast() { const msg = packet(); for (const c of clients) { try { c.write(msg); } catch (e) {} } persist(); }
 
@@ -54,7 +88,7 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
     return fs.readFile(HTML, (e, buf) => e ? send(res, 500, { erro: 'site não encontrado' }) : send(res, 200, buf, 'text/html; charset=utf-8'));
   }
-  if (req.method === 'GET' && url.pathname === '/healthz') return send(res, 200, { ok: true, modalidade: MOD, rev });
+  if (req.method === 'GET' && url.pathname === '/healthz') return send(res, 200, { ok: true, modalidade: MOD, rev, banco: !!process.env.REDIS_URL, bancoOk: kvOk });
   if (req.method === 'GET' && url.pathname === '/api/state') return send(res, 200, { st: state, tv, rev, now: Date.now(), pin: !!PIN, modalidade: MOD });
   if (req.method === 'GET' && url.pathname === '/api/stream') {
     res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', 'Connection': 'keep-alive', 'X-Accel-Buffering': 'no' });
@@ -84,4 +118,9 @@ const server = http.createServer((req, res) => {
   }
   send(res, 404, { erro: 'não encontrado' });
 });
-server.listen(PORT, () => console.log(`${MOD} na porta ${PORT}${PIN ? ' (edição com PIN)' : ' (SEM PIN)'}`));
+/* ao iniciar: se houver cópia no banco mais nova que a local, usa a do banco */
+(async () => {
+  try { const v = await kv(['GET', KEY]); if (v) { const j = JSON.parse(v); if (j.state && (!state || (j.state.atualizado || 0) >= (state.atualizado || 0))) { state = j.state; tv = j.tv || tv; rev = j.rev || rev; } } kvOk = !!process.env.REDIS_URL; console.log('banco:', process.env.REDIS_URL ? (v ? 'estado carregado' : 'vazio') : 'sem REDIS_URL'); }
+  catch (e) { console.error('kv get', e.message); }
+  server.listen(PORT, () => console.log(`${MOD} na porta ${PORT}${PIN ? ' (edição com PIN)' : ' (SEM PIN)'}`));
+})();
